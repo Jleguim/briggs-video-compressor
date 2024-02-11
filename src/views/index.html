@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <script src="https://kit.fontawesome.com/c63ba016e0.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <title>Briggs' Compressor</title>
+  </head>
+  <body class="bg-gray-100">
+    <div class="flex flex-col py-2.5 px-2 min-h-screen gap-2">
+      <button
+        id="uploadBtn"
+        class="rounded-md bg-white shadow-sm ring-1 ring-inset ring-gray-300 w-full py-2.5 text-sm enabled:hover:ring-blue-600 enabled:hover:bg-sky-100 disabled:opacity-75">
+        Select Videos
+      </button>
+
+      <div class="flex justify-center items-center gap-2">
+        <label class="text-sm w-max text-nowrap">File Size (MB)</label>
+        <input
+          type="number"
+          placeholder="25.0"
+          value="25.0"
+          id="fileSizeInpt"
+          class="rounded-md bg-white w-full py-2.5 text-sm shadow-sm ring-1 ring-inset ring-gray-300 focus:outline-none focus:ring-blue-600 hover:ring-blue-600 grow text-center [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none disabled:opacity-75" />
+      </div>
+
+      <div class="flex justify-center items-center gap-2">
+        <label class="text-sm w-max text-nowrap">Encoder</label>
+        <select
+          id="encoderSelct"
+          class="rounded-md bg-white w-full py-2.5 text-sm shadow-sm ring-1 ring-inset ring-gray-300 focus:outline-none focus:ring-blue-600 hover:ring-blue-600 grow text-center [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
+          <option value="libx264" selected>Default (CPU)</option>
+          <option value="h264_amf">AMD HW H.264</option>
+          <option value="h264_nvenc">NVIDIA NVENC H.264</option>
+        </select>
+      </div>
+
+      <button
+        id="startBtn"
+        class="rounded-md bg-white w-full py-2.5 text-sm shadow-sm ring-1 ring-inset ring-gray-300 enabled:hover:ring-blue-600 enabled:hover:bg-sky-100 disabled:opacity-75">
+        Compress
+      </button>
+      <!-- <button
+        id="cancelBtn"
+        class="rounded-md bg-white w-full py-2.5 text-sm shadow-sm ring-1 ring-inset ring-gray-300 enabled:hover:ring-blue-600 enabled:hover:bg-sky-100 disabled:opacity-75">
+        Abort
+      </button> -->
+
+      <div id="infoBox"></div>
+
+      <button
+        id="appVersion"
+        class="mt-auto rounded-md bg-white w-full py-2 text-xs shadow-sm ring-1 ring-inset ring-gray-300 enabled:hover:ring-blue-600 enabled:hover:bg-sky-100">
+        v1.0.0
+      </button>
+    </div>
+
+    <script src="../js/index.js"></script>
+  </body>
+</html>

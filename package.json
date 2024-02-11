@@ -1,0 +1,24 @@
+{
+  "name": "briggs-video-compressor",
+  "version": "1.0.0",
+  "description": "Un compressor de videos liviano.",
+  "keywords": [
+    "mp4",
+    "video",
+    "compressor"
+  ],
+  "type": "commonjs",
+  "main": "src/main.js",
+  "license": "MIT",
+  "author": "Javier Leguizamo",
+  "scripts": {
+    "test": "electron src/test/test.js",
+    "start": "electron ."
+  },
+  "dependencies": {
+    "extract-zip": "^2.0.1"
+  },
+  "devDependencies": {
+    "electron": "^28.2.2"
+  }
+}
