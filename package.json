@@ -1,7 +1,7 @@
 {
   "name": "briggs-video-compressor",
   "version": "1.0.0",
-  "description": "Un compressor de videos liviano.",
+  "description": "Un compresor de video simple",
   "keywords": [
     "mp4",
     "video",
@@ -13,12 +13,21 @@
   "author": "Javier Leguizamo",
   "scripts": {
     "test": "electron src/test/test.js",
-    "start": "electron ."
+    "start": "electron-forge start",
+    "package": "electron-forge package",
+    "make": "electron-forge make"
   },
   "dependencies": {
+    "electron-squirrel-startup": "^1.0.0",
     "extract-zip": "^2.0.1"
   },
   "devDependencies": {
+    "@electron-forge/cli": "^7.2.0",
+    "@electron-forge/maker-deb": "^7.2.0",
+    "@electron-forge/maker-rpm": "^7.2.0",
+    "@electron-forge/maker-squirrel": "^7.2.0",
+    "@electron-forge/maker-zip": "^7.2.0",
+    "@electron-forge/plugin-auto-unpack-natives": "^7.2.0",
     "electron": "^28.2.2"
   }
 }

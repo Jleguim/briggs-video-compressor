@@ -1,5 +1,7 @@
 # Custom
 */test
+src/bin
+src/output
 package-lock.json
 
 # Logs
