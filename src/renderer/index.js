@@ -11,6 +11,18 @@ abortBtn.disabled = true
 
 window.addEventListener('DOMContentLoaded', async function () {
   appVersion.innerText = `v${await window.app.getVersion()}`
+
+  // Load encoders
+  let encoders = await window.ffmpeg.getEncoders()
+
+  for (const name in encoders) {
+    let encoder = encoders[name]
+    let option = document.createElement('option')
+    option.value = name
+    option.innerText = encoder.displayName
+    option.selected = encoder.default
+    encoderSelect.appendChild(option)
+  }
 })
 
 selectVideosBtn.addEventListener('click', async function () {

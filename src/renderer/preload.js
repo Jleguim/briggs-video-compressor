@@ -5,6 +5,7 @@ contextBridge.exposeInMainWorld('ffmpeg', {
   promptVideoSelection: () => ipcRenderer.invoke('ffmpeg:promptVideoSelection'),
   start: (files, encoder, size) => ipcRenderer.invoke('ffmpeg:start', files, encoder, size),
   abort: () => ipcRenderer.invoke('ffmpeg:abort'),
+  getEncoders: () => ipcRenderer.invoke('ffmpeg:getEncoders'),
   // Event handlers
   onStart: (cb) => ipcRenderer.on('ffmpeg:event:start', (e, queueData) => cb(queueData)),
   onWalk: (cb) => ipcRenderer.on('ffmpeg:event:walk', (e, queueData) => cb(queueData)),

@@ -53,6 +53,10 @@ module.exports['ffmpeg:abort'] = function () {
   compressor.compressionQueue.abort()
 }
 
+module.exports['ffmpeg:getEncoders'] = function (e) {
+  return compressor.ENCODERS
+}
+
 for (const eventName in module.exports) {
   var handler = module.exports[eventName]
   ipcMain.handle(eventName, handler)
