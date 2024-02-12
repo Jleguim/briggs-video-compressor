@@ -2,7 +2,7 @@
   "name": "briggs-video-compressor",
   "readableName": "Briggs' Compressor",
   "version": "1.2.0",
-  "description": "Un compresor de video simple",
+  "description": "A simple video compressor",
   "keywords": [
     "mp4",
     "video",
