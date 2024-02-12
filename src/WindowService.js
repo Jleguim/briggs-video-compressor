@@ -1,10 +1,10 @@
-const { BrowserWindow } = require('electron')
+const { BrowserWindow, app } = require('electron')
 const path = require('path')
 
 class WindowService {
   constructor() {
     this.mainWindow = null
-    this.isDev = process.env.NODE_ENV !== 'production'
+    // this.isDev = process.env.NODE_ENV !== 'production' // THIS DOESNT WORK
   }
 
   createMainWindow() {
@@ -13,6 +13,7 @@ class WindowService {
 
     this.mainWindow = new BrowserWindow({
       title: readableName,
+      // icon: '',
       width: 250,
       height: 350,
       autoHideMenuBar: true,
@@ -22,7 +23,7 @@ class WindowService {
       },
     })
 
-    if (this.isDev) this.mainWindow.webContents.openDevTools()
+    // if (this.isDev) this.mainWindow.webContents.openDevTools()
     return this.mainWindow
   }
 }

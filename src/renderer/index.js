@@ -37,6 +37,7 @@ encoderSelect.addEventListener('change', async function () {
 selectVideosBtn.addEventListener('click', async function () {
   window.logger.status('renderer', 'selectVideosBtn clicked')
   var files = await window.ffmpeg.promptVideoSelection()
+  if (files.length == 0) return
   selectVideosBtn.value = files
   window.logger.debug('renderer', { files })
 
