@@ -11,7 +11,6 @@ abortBtn.disabled = true
 
 window.addEventListener('DOMContentLoaded', async function () {
   appVersion.innerText = `v${await window.app.getVersion()}`
-  document.head.querySelector('title').innerText = await window.app.getName()
 })
 
 selectVideosBtn.addEventListener('click', async function () {
