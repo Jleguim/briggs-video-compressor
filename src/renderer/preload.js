@@ -1,5 +1,11 @@
 const { contextBridge, ipcRenderer } = require('electron')
 
+contextBridge.exposeInMainWorld('settingsapi', {
+  promptDirectorySelection: () => ipcRenderer.invoke('settings:promptDirectorySelection'),
+  get: () => ipcRenderer.invoke('settings:get'),
+  save: (settings) => ipcRenderer.invoke('settings:save', settings),
+})
+
 contextBridge.exposeInMainWorld('ffmpeg', {
   // Methods
   promptVideoSelection: () => ipcRenderer.invoke('ffmpeg:promptVideoSelection'),

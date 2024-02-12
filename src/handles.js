@@ -1,7 +1,9 @@
-const { dialog, ipcMain } = require('electron')
+const { dialog, ipcMain, app } = require('electron')
 const { exec } = require('child_process')
 
-const { compressor, winManager } = require('./main')
+const { compressor, winManager, settings } = require('./main')
+const path = require('path')
+const fs = require('fs')
 
 module.exports['app:version'] = function (e) {
   const package = require('../package.json')
@@ -26,6 +28,24 @@ module.exports['logging:debug'] = function (e, module, variables = {}) {
 module.exports['dialog:promptFileSelect'] = function (e, filters, properties) {
   const MainWindow = winManager.mainWindow
   return dialog.showOpenDialogSync(MainWindow, { filters, properties })
+}
+
+module.exports['settings:promptDirectorySelection'] = function (e) {
+  var filters = []
+  var properties = ['openDirectory']
+  return module.exports['dialog:promptFileSelect'](e, filters, properties)
+}
+
+module.exports['settings:get'] = function (e) {
+  return settings.obj
+}
+
+module.exports['settings:save'] = function (e, newSettings) {
+  for (const key in newSettings) {
+    settings[key] = newSettings[key]
+  }
+
+  return settings.save()
 }
 
 module.exports['ffmpeg:promptVideoSelection'] = function (e) {

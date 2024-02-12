@@ -93,27 +93,11 @@ class CompressingQueue {
 }
 
 class FFmpeg {
-  constructor(appPath, outPath) {
-    this.BIN_PATH = path.join(appPath, 'bin')
-    var defaultPath = path.join(appPath, 'out')
-    this.OUT_PATH = path.join(outPath ? outPath : defaultPath)
-
-    this.FFMPEG_PATH = path.join(this.BIN_PATH, '/ffmpeg.exe')
-    this.FFPROBE_PATH = path.join(this.BIN_PATH, '/ffprobe.exe')
-
+  constructor() {
     this.ENCODERS = {
-      libx264: {
-        default: true,
-        displayName: 'Default (CPU)',
-      },
-      h264_amf: {
-        default: false,
-        displayName: 'AMD HW H.264',
-      },
-      h264_nvenc: {
-        default: false,
-        displayName: 'NVIDIA NVENC H.264',
-      },
+      libx264: 'CPU',
+      h264_amf: 'AMD HW H.264',
+      h264_nvenc: 'NVIDIA NVENC H.264',
     }
 
     this.FFMPEG_DL = 'https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-win64-gpl.zip'
@@ -166,6 +150,9 @@ class FFmpeg {
   }
 
   async checkFFmpeg() {
+    this.FFMPEG_PATH = path.join(this.BIN_PATH, '/ffmpeg.exe')
+    this.FFPROBE_PATH = path.join(this.BIN_PATH, '/ffprobe.exe')
+
     if (fs.existsSync(this.FFMPEG_PATH) && fs.existsSync(this.FFPROBE_PATH)) {
       return console.log('FFmpeg found, starting...')
     }
@@ -174,7 +161,10 @@ class FFmpeg {
     await this.downloadFFmpeg()
   }
 
-  checkDirs() {
+  checkDirs(appPath, settings) {
+    this.BIN_PATH = path.join(appPath, 'bin')
+    this.OUT_PATH = settings.out
+
     if (!fs.existsSync(this.BIN_PATH)) {
       console.log('Creating bin directory...')
       fs.mkdirSync(this.BIN_PATH)

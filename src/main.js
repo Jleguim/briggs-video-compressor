@@ -3,12 +3,15 @@ const path = require('path')
 
 const FFmpeg = require('./FFmpegService.js')
 const WindowService = require('./WindowService.js')
+const SettingService = require('./SettingService.js')
 
-const compressor = new FFmpeg(app.getPath('userData'))
+const compressor = new FFmpeg()
 const winManager = new WindowService()
+const settings = new SettingService()
 
 app.once('ready', async function () {
-  compressor.checkDirs()
+  settings.load()
+  compressor.checkDirs(app.getPath('userData'), settings)
   await compressor.checkFFmpeg()
 
   var view = path.join(__dirname, '/renderer/index.html')
@@ -18,4 +21,4 @@ app.once('ready', async function () {
   require('./handles.js')
 })
 
-module.exports = { compressor, winManager }
+module.exports = { compressor, winManager, settings }

@@ -5,24 +5,35 @@ let compressBtn = document.getElementById('compressBtn')
 let abortBtn = document.getElementById('abortBtn')
 let infoBox = document.getElementById('infoBox')
 let appVersion = document.getElementById('appVersion')
+let folderBtn = document.getElementById('folderBtn')
 
 compressBtn.disabled = true
 abortBtn.disabled = true
 
+var settings
+
 window.addEventListener('DOMContentLoaded', async function () {
   appVersion.innerText = `v${await window.app.getVersion()}`
-
   // Load encoders
   let encoders = await window.ffmpeg.getEncoders()
+  settings = await window.settingsapi.get()
 
-  for (const name in encoders) {
-    let encoder = encoders[name]
+  for (const encoder in encoders) {
+    let name = encoders[encoder]
     let option = document.createElement('option')
-    option.value = name
-    option.innerText = encoder.displayName
-    option.selected = encoder.default
+    option.value = encoder
+    option.innerText = name
+    option.selected = encoder == settings.encoder
     encoderSelect.appendChild(option)
   }
+})
+
+encoderSelect.addEventListener('change', async function () {
+  if (settings.encoder == encoderSelect.value) return
+  console.log(settings, encoderSelect.value)
+
+  settings.encoder = encoderSelect.value
+  await window.settingsapi.save(settings)
 })
 
 selectVideosBtn.addEventListener('click', async function () {
@@ -61,6 +72,17 @@ abortBtn.addEventListener('click', async function () {
   fileSizeInpt.disabled = false
   compressBtn.disabled = true
   abortBtn.disabled = true
+})
+
+folderBtn.addEventListener('click', async function () {
+  var folders = await window.settingsapi.promptDirectorySelection()
+  if (folders.length == 0) return
+  var folderPath = folders[0]
+
+  if (settings.out == folderPath) return
+
+  settings.out = folderPath
+  await window.settingsapi.save(settings)
 })
 
 window.ffmpeg.onStart(function ({ pos, length }) {

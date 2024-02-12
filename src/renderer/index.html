@@ -43,11 +43,20 @@
         Abort
       </button>
 
-      <div id="infoBox"></div>
+      <div id="infoBox" class="py-1 bg-gray-200 ring-black ring-1 my-auto text-center text-sm text-bold h-5"></div>
 
-      <button
-        id="appVersion"
-        class="mt-auto rounded-md bg-white w-full py-2 text-xs shadow-sm ring-1 ring-inset ring-gray-300 enabled:hover:ring-blue-600 enabled:hover:bg-sky-100"></button>
+      <div class="flex justify-center items-center gap-2">
+        <button
+          id="appVersion"
+          class="rounded-md bg-white w-full py-2 text-xs shadow-sm ring-1 ring-inset ring-gray-300 enabled:hover:ring-blue-600 enabled:hover:bg-sky-100">
+          v0.0.0
+        </button>
+        <button
+          id="folderBtn"
+          class="rounded-md bg-white px-2 py-2 text-xs shadow-sm ring-1 ring-inset ring-gray-300 enabled:hover:ring-blue-600 enabled:hover:bg-sky-100">
+          <i class="fa-solid fa-folder"></i>
+        </button>
+      </div>
     </div>
 
     <script src="index.js"></script>
