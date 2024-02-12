@@ -1,7 +1,7 @@
 {
   "name": "briggs-video-compressor",
   "readableName": "Briggs' Compressor",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Un compresor de video simple",
   "keywords": [
     "mp4",

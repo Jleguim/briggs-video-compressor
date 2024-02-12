@@ -47,8 +47,8 @@ class CompressingQueue {
 
     var child = spawn(FFMPEG_PATH, args)
     this.currentTask = { child, OUTPUT_PATH, source }
-    // child.stdout.on('data', (data) => console.log(data.toString()))
-    // child.stderr.on('data', (data) => console.log(data.toString()))
+    child.stdout.on('data', (data) => console.log(data.toString()))
+    child.stderr.on('data', (data) => console.log(data.toString()))
 
     child.on('close', () => {
       if (this.aborted) return
