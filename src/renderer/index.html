@@ -10,9 +10,9 @@
     <title>Briggs' Compressor</title>
   </head>
   <body class="bg-gray-100">
-    <div class="flex flex-col py-2.5 px-2 min-h-screen gap-2">
+    <div class="flex flex-col py-2.5 px-2 min-h-screen gap-1.5">
       <button
-        id="uploadBtn"
+        id="selectVideosBtn"
         class="rounded-md bg-white shadow-sm ring-1 ring-inset ring-gray-300 w-full py-2.5 text-sm enabled:hover:ring-blue-600 enabled:hover:bg-sky-100 disabled:opacity-75">
         Select Videos
       </button>
@@ -30,7 +30,7 @@
       <div class="flex justify-center items-center gap-2">
         <label class="text-sm w-max text-nowrap">Encoder</label>
         <select
-          id="encoderSelct"
+          id="encoderSelect"
           class="rounded-md bg-white w-full py-2.5 text-sm shadow-sm ring-1 ring-inset ring-gray-300 focus:outline-none focus:ring-blue-600 hover:ring-blue-600 grow text-center [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
           <option value="libx264" selected>Default (CPU)</option>
           <option value="h264_amf">AMD HW H.264</option>
@@ -39,25 +39,23 @@
       </div>
 
       <button
-        id="startBtn"
+        id="compressBtn"
         class="rounded-md bg-white w-full py-2.5 text-sm shadow-sm ring-1 ring-inset ring-gray-300 enabled:hover:ring-blue-600 enabled:hover:bg-sky-100 disabled:opacity-75">
         Compress
       </button>
-      <!-- <button
-        id="cancelBtn"
+      <button
+        id="abortBtn"
         class="rounded-md bg-white w-full py-2.5 text-sm shadow-sm ring-1 ring-inset ring-gray-300 enabled:hover:ring-blue-600 enabled:hover:bg-sky-100 disabled:opacity-75">
         Abort
-      </button> -->
+      </button>
 
       <div id="infoBox"></div>
 
       <button
         id="appVersion"
-        class="mt-auto rounded-md bg-white w-full py-2 text-xs shadow-sm ring-1 ring-inset ring-gray-300 enabled:hover:ring-blue-600 enabled:hover:bg-sky-100">
-        v1.0.0
-      </button>
+        class="mt-auto rounded-md bg-white w-full py-2 text-xs shadow-sm ring-1 ring-inset ring-gray-300 enabled:hover:ring-blue-600 enabled:hover:bg-sky-100"></button>
     </div>
 
-    <script src="../js/index.js"></script>
+    <script src="index.js"></script>
   </body>
 </html>
