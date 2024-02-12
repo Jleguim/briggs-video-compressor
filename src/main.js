@@ -1,4 +1,6 @@
 const { app } = require('electron')
+const { autoUpdater } = require('electron-updater')
+
 const path = require('path')
 
 const FFmpeg = require('./FFmpegService.js')
@@ -9,16 +11,27 @@ const compressor = new FFmpeg()
 const winManager = new WindowService()
 const settings = new SettingService()
 
-app.once('ready', async function () {
-  settings.load()
-  compressor.checkDirs(app.getPath('userData'), settings)
-  await compressor.checkFFmpeg()
+app.once('ready', function () {
+  autoUpdater.checkForUpdates()
+  autoUpdater.on('update-available', () => console.log('update-available'))
 
-  var view = path.join(__dirname, '/renderer/index.html')
-  var mainWindow = winManager.createMainWindow()
-  mainWindow.loadFile(view)
+  autoUpdater.on('update-downloaded', () => {
+    console.log('update-downloaded')
+    autoUpdater.quitAndInstall()
+  })
 
-  require('./handles.js')
+  autoUpdater.on('update-not-available', async () => {
+    console.log('update-not-available')
+    settings.load()
+    compressor.checkDirs(app.getPath('userData'), settings)
+    await compressor.checkFFmpeg()
+
+    var view = path.join(__dirname, '/renderer/index.html')
+    var mainWindow = winManager.createMainWindow()
+    mainWindow.loadFile(view)
+
+    require('./handles.js')
+  })
 })
 
 module.exports = { compressor, winManager, settings }
