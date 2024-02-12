@@ -30,8 +30,6 @@ window.addEventListener('DOMContentLoaded', async function () {
 
 encoderSelect.addEventListener('change', async function () {
   if (settings.encoder == encoderSelect.value) return
-  console.log(settings, encoderSelect.value)
-
   settings.encoder = encoderSelect.value
   await window.settingsapi.save(settings)
 })
