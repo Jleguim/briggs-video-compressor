@@ -49,7 +49,7 @@ module.exports['ffmpeg:start'] = function (e, videos, encoder, size) {
 }
 
 module.exports['ffmpeg:abort'] = function () {
-  module.exports['logging:status']('ffmpeg', 'Compression queue aborted')
+  module.exports['logging:status'](null, 'ffmpeg', 'Compression queue aborted')
   compressor.compressionQueue.abort()
 }
 

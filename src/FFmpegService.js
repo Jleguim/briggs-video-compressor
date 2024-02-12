@@ -51,6 +51,7 @@ class CompressingQueue {
     // child.stderr.on('data', (data) => console.log(data.toString()))
 
     child.on('close', () => {
+      if (this.aborted) return
       this.queuePosition += 1
       this.completed = this.queuePosition == this.queue.length
       this.walk()
@@ -58,8 +59,10 @@ class CompressingQueue {
   }
 
   abort() {
+    if (this.aborted) return
     this.aborted = true
     this.currentTask.child.kill('SIGINT')
+
     setTimeout(() => {
       fs.rmSync(this.currentTask.OUTPUT_PATH)
     }, 500)

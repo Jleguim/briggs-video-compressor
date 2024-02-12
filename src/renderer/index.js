@@ -49,7 +49,7 @@ abortBtn.addEventListener('click', async function () {
   encoderSelect.disabled = false
   fileSizeInpt.disabled = false
   compressBtn.disabled = true
-  abortBtn.disabled = false
+  abortBtn.disabled = true
 })
 
 window.ffmpeg.onStart(function ({ pos, length }) {
