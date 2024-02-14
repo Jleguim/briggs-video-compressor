@@ -1,10 +1,10 @@
 const { BrowserWindow, app } = require('electron')
 const path = require('path')
+const DEV_MODE = !app.isPackaged
 
 class WindowService {
   constructor() {
     this.mainWindow = null
-    // this.isDev = process.env.NODE_ENV !== 'production' // THIS DOESNT WORK
   }
 
   createMainWindow() {
@@ -23,7 +23,7 @@ class WindowService {
       },
     })
 
-    // if (this.isDev) this.mainWindow.webContents.openDevTools()
+    if (DEV_MODE) this.mainWindow.webContents.openDevTools()
     return this.mainWindow
   }
 }
