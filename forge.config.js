@@ -1,16 +1,20 @@
+const pkg = require('./package.json')
+
 module.exports = {
   packagerConfig: {
     asar: true,
+    // icon: './test_icon.ico',
+    executableName: pkg.readableName,
+    name: pkg.readableName,
   },
   rebuildConfig: {},
   makers: [
     {
       name: '@electron-forge/maker-squirrel',
-      config: {},
-    },
-    {
-      name: '@electron-forge/maker-zip',
-      platforms: ['darwin'],
+      config: {
+        exe: `${pkg.readableName}.exe`,
+        setupExe: `${pkg.readableName} v${pkg.version} Setup.exe`,
+      },
     },
   ],
   plugins: [
