@@ -51,23 +51,23 @@ module.exports['ffmpeg:promptVideoSelection'] = function (e) {
   return module.exports['dialog:promptFileSelect'](e, filters, properties)
 }
 
-module.exports['ffmpeg:start'] = function (e, videos, encoder, size) {
-  module.exports['logging:debug'](null, 'ffmpeg', { videos, encoder, size })
-  compressor.createNewCompressionQueue(videos, encoder, size)
-  compressor.compressionQueue.onStart = (queueData) =>
-    winManager.mainWindow.webContents.send('ffmpeg:event:start', queueData)
-  compressor.compressionQueue.onWalk = (queueData) =>
-    winManager.mainWindow.webContents.send('ffmpeg:event:walk', queueData)
-  compressor.compressionQueue.onFinish = (queueData) => {
+module.exports['ffmpeg:start'] = function (e, files, encoder, size, output) {
+  module.exports['logging:debug'](null, 'ffmpeg', { files, encoder, size, output })
+  var queue = compressor.newQueue(files, encoder, size, output)
+
+  queue.onStart = (queueData) => winManager.mainWindow.webContents.send('ffmpeg:event:start', queueData)
+  queue.onWalk = (queueData) => winManager.mainWindow.webContents.send('ffmpeg:event:walk', queueData)
+  queue.onFinish = (queueData) => {
     winManager.mainWindow.webContents.send('ffmpeg:event:finish', queueData)
-    exec('explorer.exe ' + compressor.OUT_PATH)
+    exec('explorer.exe ' + output)
   }
-  compressor.compressionQueue.start()
+
+  queue.start()
 }
 
 module.exports['ffmpeg:abort'] = function () {
   module.exports['logging:status'](null, 'ffmpeg', 'Compression queue aborted')
-  compressor.compressionQueue.abort()
+  compressor.queue.abort()
 }
 
 module.exports['ffmpeg:getEncoders'] = function (e) {

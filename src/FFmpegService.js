@@ -4,11 +4,14 @@ const fs = require('fs')
 const unzip = require('extract-zip')
 
 class CompressingQueue {
-  constructor(files, encoder, size, ffmpeg) {
-    this.ffmpeg = ffmpeg
-    this.settings = { encoder, size }
+  constructor(FFMPEG_PATH, FFPROBE_PATH, options) {
+    // this.ffmpeg = ffmpeg
+    this.FFMPEG_PATH = FFMPEG_PATH
+    this.FFPROBE_PATH = FFPROBE_PATH
+    // this.settings = { encoder, size }
+    this.options = options
 
-    this.queue = files
+    this.queue = this.options.files
     this.queuePosition = 0
     this.completed = false
     this.aborted = false
@@ -16,8 +19,7 @@ class CompressingQueue {
   }
 
   getVideoLength(source) {
-    const FFPROBE_PATH = this.ffmpeg.FFPROBE_PATH
-    let cmd = `"${FFPROBE_PATH}" -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "${source}"`
+    let cmd = `"${this.FFPROBE_PATH}" -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "${source}"`
     let lengthBuffer = execSync(cmd)
     let videoLength = parseFloat(lengthBuffer.toString())
     return videoLength
@@ -25,7 +27,7 @@ class CompressingQueue {
 
   calculateBitrate(source) {
     const VIDEO_LENGTH = this.getVideoLength(source)
-    const TARGET_SIZE = this.settings.size
+    const TARGET_SIZE = this.options.size
     let bitrate = Math.max(1, Math.floor((TARGET_SIZE * 8192.0) / (1.048576 * VIDEO_LENGTH) - 128))
     return bitrate
   }
@@ -39,11 +41,11 @@ class CompressingQueue {
   pass(source, bitrate) {
     if (this.aborted) return
 
-    const FFMPEG_PATH = this.ffmpeg.FFMPEG_PATH
-    const OUTPUT_FILE = `${this.getFileName(source)}-${this.settings.encoder}-compressed.mp4`
-    const OUTPUT_PATH = path.join(this.ffmpeg.OUT_PATH, OUTPUT_FILE)
+    const FFMPEG_PATH = this.FFMPEG_PATH
+    const OUTPUT_FILE = `${this.getFileName(source)}-${this.options.encoder}-compressed.mp4`
+    const OUTPUT_PATH = path.join(this.options.output, OUTPUT_FILE)
 
-    var args = ['-i', source, '-y', '-b:v', `${bitrate}k`, '-c:v', this.settings.encoder, OUTPUT_PATH]
+    var args = ['-i', source, '-y', '-b:v', `${bitrate}k`, '-c:v', this.options.encoder, OUTPUT_PATH]
 
     var child = spawn(FFMPEG_PATH, args)
     this.currentTask = { child, OUTPUT_PATH, source }
@@ -93,7 +95,12 @@ class CompressingQueue {
 }
 
 class FFmpeg {
-  constructor() {
+  constructor({ bin, out }) {
+    this.BIN_PATH = bin
+    this.OUT_PATH = out
+    this.FFMPEG_PATH = path.join(this.BIN_PATH, '/ffmpeg.exe')
+    this.FFPROBE_PATH = path.join(this.BIN_PATH, '/ffprobe.exe')
+
     this.ENCODERS = {
       libx264: 'CPU',
       h264_amf: 'AMD HW H.264',
@@ -103,9 +110,11 @@ class FFmpeg {
     this.FFMPEG_DL = 'https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-win64-gpl.zip'
   }
 
-  createNewCompressionQueue(files, encoder, size) {
-    this.compressionQueue = new CompressingQueue(files, encoder, size, this)
-    return this.compressionQueue
+  newQueue(files, encoder, size, output) {
+    var options = { files, encoder, size, output }
+    this.OUT_PATH = output
+    this.queue = new CompressingQueue(this.FFMPEG_PATH, this.FFPROBE_PATH, options)
+    return this.queue
   }
 
   async installFFMPEG(ZIP_PATH) {
@@ -150,9 +159,6 @@ class FFmpeg {
   }
 
   async checkFFmpeg() {
-    this.FFMPEG_PATH = path.join(this.BIN_PATH, '/ffmpeg.exe')
-    this.FFPROBE_PATH = path.join(this.BIN_PATH, '/ffprobe.exe')
-
     if (fs.existsSync(this.FFMPEG_PATH) && fs.existsSync(this.FFPROBE_PATH)) {
       return console.log('FFmpeg found, starting...')
     }
@@ -161,10 +167,7 @@ class FFmpeg {
     await this.downloadFFmpeg()
   }
 
-  checkDirs(appPath, settings) {
-    this.BIN_PATH = path.join(appPath, 'bin')
-    this.OUT_PATH = settings.out
-
+  checkDirs() {
     if (!fs.existsSync(this.BIN_PATH)) {
       console.log('Creating bin directory...')
       fs.mkdirSync(this.BIN_PATH)

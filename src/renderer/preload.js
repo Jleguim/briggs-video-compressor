@@ -9,7 +9,7 @@ contextBridge.exposeInMainWorld('settingsapi', {
 contextBridge.exposeInMainWorld('ffmpeg', {
   // Methods
   promptVideoSelection: () => ipcRenderer.invoke('ffmpeg:promptVideoSelection'),
-  start: (files, encoder, size) => ipcRenderer.invoke('ffmpeg:start', files, encoder, size),
+  start: (files, encoder, size, output) => ipcRenderer.invoke('ffmpeg:start', files, encoder, size, output),
   abort: () => ipcRenderer.invoke('ffmpeg:abort'),
   getEncoders: () => ipcRenderer.invoke('ffmpeg:getEncoders'),
   // Event handlers

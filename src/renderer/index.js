@@ -50,9 +50,10 @@ compressBtn.addEventListener('click', async function () {
   let files = selectVideosBtn.value.split(',')
   let encoder = encoderSelect.value
   let size = fileSizeInpt.value
-  window.logger.debug('renderer', { files, encoder, size })
+  let output = settings.out
+  window.logger.debug('renderer', { files, encoder, size, output })
 
-  await window.ffmpeg.start(files, encoder, size)
+  await window.ffmpeg.start(files, encoder, size, output)
 
   selectVideosBtn.disabled = true
   encoderSelect.disabled = true
