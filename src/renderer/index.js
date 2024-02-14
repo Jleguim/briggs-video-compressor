@@ -37,7 +37,7 @@ encoderSelect.addEventListener('change', async function () {
 selectVideosBtn.addEventListener('click', async function () {
   window.logger.status('renderer', 'selectVideosBtn clicked')
   var files = await window.ffmpeg.promptVideoSelection()
-  if (files.length == 0) return
+  if (!files) return
   selectVideosBtn.value = files
   window.logger.debug('renderer', { files })
 
@@ -75,7 +75,7 @@ abortBtn.addEventListener('click', async function () {
 
 folderBtn.addEventListener('click', async function () {
   var folders = await window.settingsapi.promptDirectorySelection()
-  if (folders.length == 0) return
+  if (!folders) return
   var folderPath = folders[0]
 
   if (settings.out == folderPath) return
