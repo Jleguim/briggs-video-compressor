@@ -10,7 +10,7 @@ const settings = new SettingService()
 const compressor = new FFmpeg(settings)
 
 if (app.isPackaged) {
-  const server = 'https://hazel-test-five.vercel.app'
+  const server = 'https://hazel-test-beta.vercel.app/'
   const url = `${server}/update/${process.platform}/${app.getVersion()}`
 
   autoUpdater.setFeedURL({ url })
