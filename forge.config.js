@@ -3,7 +3,7 @@ const pkg = require('./package.json')
 module.exports = {
   packagerConfig: {
     asar: true,
-    icon: './test_icon.ico',
+    // icon: './test_icon.ico',
     executableName: pkg.readableName,
     name: pkg.readableName,
   },
