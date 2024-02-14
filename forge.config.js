@@ -4,6 +4,8 @@ module.exports = {
   packagerConfig: {
     asar: true,
     icon: './test_icon.ico',
+    executableName: pkg.readableName,
+    name: pkg.readableName,
   },
   rebuildConfig: {},
   makers: [
