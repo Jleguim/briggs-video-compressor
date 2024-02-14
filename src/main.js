@@ -50,4 +50,6 @@ app.once('ready', async function () {
   require('./handles.js')
 })
 
+if (require('electron-squirrel-startup')) app.quit()
+
 module.exports = { compressor, winManager, settings }
