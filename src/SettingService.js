@@ -8,6 +8,9 @@ class Settings {
 
     this.encoder = 'libx264'
     this.out = path.join(app.getPath('userData'), '/out')
+    this.bin = path.join(app.getPath('userData'), '/bin')
+
+    this.load()
   }
 
   get obj() {

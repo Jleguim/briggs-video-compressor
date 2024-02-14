@@ -7,9 +7,9 @@ const FFmpeg = require('./FFmpegService.js')
 const WindowService = require('./WindowService.js')
 const SettingService = require('./SettingService.js')
 
-const compressor = new FFmpeg()
 const winManager = new WindowService()
 const settings = new SettingService()
+const compressor = new FFmpeg(settings)
 
 app.once('ready', function () {
   autoUpdater.checkForUpdates()

@@ -41,10 +41,7 @@ module.exports['settings:get'] = function (e) {
 }
 
 module.exports['settings:save'] = function (e, newSettings) {
-  for (const key in newSettings) {
-    settings[key] = newSettings[key]
-  }
-
+  settings.obj = newSettings
   return settings.save()
 }
 
