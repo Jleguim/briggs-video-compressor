@@ -7,4 +7,4 @@ A simple video compressor
 - Option to change encoder (AMD and NVENC available)
 - Opens file explorer after it finishes for easy access
   
-https://github.com/Jleguim/briggs-video-compressor/assets/37165927/5fa657b2-3875-4796-9fbb-ec1bbde6f28d
+https://github.com/Jleguim/briggs-video-compressor/assets/37165927/4de41f15-0d00-435e-851d-b07798a7bc37
