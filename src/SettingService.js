@@ -34,7 +34,7 @@ class Settings {
   load() {
     if (!fs.existsSync(this.SETTINGS_PATH)) return this.save()
 
-    var data = fs.readFileSync(this.SETTINGS_PATH)
+    let data = fs.readFileSync(this.SETTINGS_PATH)
     this.obj = JSON.parse(data)
     return this.obj
   }

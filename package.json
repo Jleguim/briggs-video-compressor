@@ -1,7 +1,7 @@
 {
   "name": "briggs-video-compressor",
   "readableName": "Briggs Compressor",
-  "version": "1.4.3",
+  "version": "1.3.0",
   "description": "Un compresor de video simple",
   "keywords": [
     "mp4",
@@ -11,15 +11,17 @@
   "type": "commonjs",
   "main": "src/main.js",
   "license": "MIT",
-  "author": "Javier Leguizamo",
+  "author": "Jleguim",
   "scripts": {
     "start": "electron-forge start",
     "package": "electron-forge package",
     "make": "electron-forge make"
   },
   "dependencies": {
+    "compare-versions": "^6.1.0",
     "electron-squirrel-startup": "^1.0.0",
-    "extract-zip": "^2.0.1"
+    "extract-zip": "^2.0.1",
+    "octokit": "^3.1.2"
   },
   "devDependencies": {
     "@electron-forge/cli": "^7.2.0",
