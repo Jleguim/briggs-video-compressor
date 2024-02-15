@@ -8,8 +8,8 @@ class WindowService {
   }
 
   createMainWindow() {
-    var preload = path.join(__dirname, '/renderer/preload.js')
-    var readableName = require('../package.json').readableName
+    let preload = path.join(__dirname, '/renderer/preload.js')
+    let readableName = require('../package.json').readableName
 
     this.mainWindow = new BrowserWindow({
       title: readableName,

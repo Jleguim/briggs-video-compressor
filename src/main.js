@@ -45,6 +45,8 @@ app.once('ready', async function () {
 
   var view = path.join(__dirname, '/renderer/index.html')
   var mainWindow = winManager.createMainWindow()
+  let view = path.join(__dirname, '/renderer/index.html')
+  let mainWindow = winManager.createMainWindow()
   mainWindow.loadFile(view)
 
   require('./handles.js')

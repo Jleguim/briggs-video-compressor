@@ -31,8 +31,8 @@ module.exports['dialog:promptFileSelect'] = function (e, filters, properties) {
 }
 
 module.exports['settings:promptDirectorySelection'] = function (e) {
-  var filters = []
-  var properties = ['openDirectory']
+  let filters = []
+  let properties = ['openDirectory']
   return module.exports['dialog:promptFileSelect'](e, filters, properties)
 }
 
@@ -46,14 +46,14 @@ module.exports['settings:save'] = function (e, newSettings) {
 }
 
 module.exports['ffmpeg:promptVideoSelection'] = function (e) {
-  var filters = [{ name: 'Videos', extensions: ['mkv', 'avi', 'mp4'] }]
-  var properties = ['multiSelections']
+  let filters = [{ name: 'Videos', extensions: ['mkv', 'avi', 'mp4'] }]
+  let properties = ['multiSelections']
   return module.exports['dialog:promptFileSelect'](e, filters, properties)
 }
 
 module.exports['ffmpeg:start'] = function (e, files, encoder, size, output) {
   module.exports['logging:debug'](null, 'ffmpeg', { files, encoder, size, output })
-  var queue = compressor.newQueue(files, encoder, size, output)
+  let queue = compressor.newQueue(files, encoder, size, output)
 
   queue.onStart = (queueData) => winManager.mainWindow.webContents.send('ffmpeg:event:start', queueData)
   queue.onWalk = (queueData) => winManager.mainWindow.webContents.send('ffmpeg:event:walk', queueData)
@@ -75,6 +75,6 @@ module.exports['ffmpeg:getEncoders'] = function (e) {
 }
 
 for (const eventName in module.exports) {
-  var handler = module.exports[eventName]
+  let handler = module.exports[eventName]
   ipcMain.handle(eventName, handler)
 }

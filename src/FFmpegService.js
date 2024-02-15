@@ -45,9 +45,9 @@ class CompressingQueue {
     const OUTPUT_FILE = `${this.getFileName(source)}-${this.options.encoder}-compressed.mp4`
     const OUTPUT_PATH = path.join(this.options.output, OUTPUT_FILE)
 
-    var args = ['-i', source, '-y', '-b:v', `${bitrate}k`, '-c:v', this.options.encoder, OUTPUT_PATH]
+    let args = ['-i', source, '-y', '-b:v', `${bitrate}k`, '-c:v', this.options.encoder, OUTPUT_PATH]
 
-    var child = spawn(FFMPEG_PATH, args)
+    let child = spawn(FFMPEG_PATH, args)
     this.currentTask = { child, OUTPUT_PATH, source }
     child.stdout.on('data', (data) => console.log(data.toString()))
     child.stderr.on('data', (data) => console.log(data.toString()))
@@ -78,8 +78,8 @@ class CompressingQueue {
   walk() {
     if (this.completed) return this.finish()
 
-    var nextFile = this.queue[this.queuePosition]
-    var targetBitrate = this.calculateBitrate(nextFile)
+    let nextFile = this.queue[this.queuePosition]
+    let targetBitrate = this.calculateBitrate(nextFile)
 
     console.log('Walked compression queue')
     if (this.onWalk) this.onWalk({ queue: this.queue, length: this.queue.length, pos: this.queuePosition })
@@ -111,7 +111,7 @@ class FFmpeg {
   }
 
   newQueue(files, encoder, size, output) {
-    var options = { files, encoder, size, output }
+    let options = { files, encoder, size, output }
     this.OUT_PATH = output
     this.queue = new CompressingQueue(this.FFMPEG_PATH, this.FFPROBE_PATH, options)
     return this.queue

@@ -10,7 +10,7 @@ let folderBtn = document.getElementById('folderBtn')
 compressBtn.disabled = true
 abortBtn.disabled = true
 
-var settings
+let settings
 
 window.addEventListener('DOMContentLoaded', async function () {
   appVersion.innerText = `v${await window.app.getVersion()}`
@@ -36,7 +36,7 @@ encoderSelect.addEventListener('change', async function () {
 
 selectVideosBtn.addEventListener('click', async function () {
   window.logger.status('renderer', 'selectVideosBtn clicked')
-  var files = await window.ffmpeg.promptVideoSelection()
+  let files = await window.ffmpeg.promptVideoSelection()
   if (!files) return
   selectVideosBtn.value = files
   window.logger.debug('renderer', { files })
@@ -75,9 +75,9 @@ abortBtn.addEventListener('click', async function () {
 })
 
 folderBtn.addEventListener('click', async function () {
-  var folders = await window.settingsapi.promptDirectorySelection()
+  let folders = await window.settingsapi.promptDirectorySelection()
   if (!folders) return
-  var folderPath = folders[0]
+  let folderPath = folders[0]
 
   if (settings.out == folderPath) return
 
