@@ -17,12 +17,14 @@ class Settings {
     return {
       encoder: this.encoder,
       out: this.out,
+      lastInputPath: this.lastInputPath,
     }
   }
 
   set obj(settings) {
     this.encoder = settings.encoder
     this.out = settings.out
+    this.lastInputPath = settings.lastInputPath
   }
 
   save() {
