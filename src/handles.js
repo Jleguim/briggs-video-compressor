@@ -25,15 +25,14 @@ module.exports['logging:debug'] = function (e, module, variables = {}) {
   }
 }
 
-module.exports['dialog:promptFileSelect'] = function (e, filters, properties) {
+module.exports['dialog:promptSelect'] = async function (e, opts) {
   const MainWindow = winManager.mainWindow
-  return dialog.showOpenDialogSync(MainWindow, { filters, properties })
-}
-
-module.exports['settings:promptDirectorySelection'] = function (e) {
-  let filters = []
-  let properties = ['openDirectory']
-  return module.exports['dialog:promptFileSelect'](e, filters, properties)
+  let selection = await dialog.showOpenDialogSync(MainWindow, opts)
+  if (opts.properties.includes('openDirectory')) {
+    return { folders: selection, dir: selection ? selection[0] : undefined }
+  } else {
+    return { files: selection, dir: selection ? path.dirname(selection[0]) : undefined }
+  }
 }
 
 module.exports['settings:get'] = function (e) {
@@ -43,12 +42,6 @@ module.exports['settings:get'] = function (e) {
 module.exports['settings:save'] = function (e, newSettings) {
   settings.obj = newSettings
   return settings.save()
-}
-
-module.exports['ffmpeg:promptVideoSelection'] = function (e) {
-  let filters = [{ name: 'Videos', extensions: ['mkv', 'avi', 'mp4'] }]
-  let properties = ['multiSelections']
-  return module.exports['dialog:promptFileSelect'](e, filters, properties)
 }
 
 module.exports['ffmpeg:start'] = function (e, files, encoder, size, output) {

@@ -1,14 +1,7 @@
 const { contextBridge, ipcRenderer } = require('electron')
 
-contextBridge.exposeInMainWorld('settingsapi', {
-  promptDirectorySelection: () => ipcRenderer.invoke('settings:promptDirectorySelection'),
-  get: () => ipcRenderer.invoke('settings:get'),
-  save: (settings) => ipcRenderer.invoke('settings:save', settings),
-})
-
 contextBridge.exposeInMainWorld('ffmpeg', {
   // Methods
-  promptVideoSelection: () => ipcRenderer.invoke('ffmpeg:promptVideoSelection'),
   start: (files, encoder, size, output) => ipcRenderer.invoke('ffmpeg:start', files, encoder, size, output),
   abort: () => ipcRenderer.invoke('ffmpeg:abort'),
   getEncoders: () => ipcRenderer.invoke('ffmpeg:getEncoders'),
@@ -18,9 +11,25 @@ contextBridge.exposeInMainWorld('ffmpeg', {
   onFinish: (cb) => ipcRenderer.on('ffmpeg:event:finish', (e, queueData) => cb(queueData)),
 })
 
+async function promptSelect(type, defaultPath) {
+  if (type == 'videos') {
+    return ipcRenderer.invoke('dialog:promptSelect', {
+      filters: [{ name: 'Videos', extensions: ['mkv', 'avi', 'mp4'] }],
+      properties: ['multiSelections'],
+      defaultPath,
+    })
+  } else if (type == 'dir') {
+    return ipcRenderer.invoke('dialog:promptSelect', { properties: ['openDirectory'], defaultPath })
+  }
+}
+
 contextBridge.exposeInMainWorld('app', {
   getVersion: () => ipcRenderer.invoke('app:version'),
   getName: () => ipcRenderer.invoke('app:name'),
+  promptFileSelect: (defaultPath) => promptSelect('videos', defaultPath),
+  promptDirSelect: (defaultPath) => promptSelect('dir', defaultPath),
+  get: () => ipcRenderer.invoke('settings:get'),
+  save: (settings) => ipcRenderer.invoke('settings:save', settings),
 })
 
 contextBridge.exposeInMainWorld('logger', {

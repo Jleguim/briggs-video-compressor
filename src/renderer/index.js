@@ -16,7 +16,7 @@ window.addEventListener('DOMContentLoaded', async function () {
   appVersion.innerText = `v${await window.app.getVersion()}`
   // Load encoders
   let encoders = await window.ffmpeg.getEncoders()
-  settings = await window.settingsapi.get()
+  settings = await window.app.get()
 
   for (const encoder in encoders) {
     let name = encoders[encoder]
@@ -29,20 +29,24 @@ window.addEventListener('DOMContentLoaded', async function () {
 })
 
 encoderSelect.addEventListener('change', async function () {
+  window.logger.status('renderer', 'encoderSelect changed')
   if (settings.encoder == encoderSelect.value) return
   settings.encoder = encoderSelect.value
-  await window.settingsapi.save(settings)
+  await window.app.save(settings)
 })
 
 selectVideosBtn.addEventListener('click', async function () {
   window.logger.status('renderer', 'selectVideosBtn clicked')
-  let files = await window.ffmpeg.promptVideoSelection()
-  if (!files) return
-  selectVideosBtn.value = files
-  window.logger.debug('renderer', { files })
+  let prompt = await window.app.promptFileSelect(settings.lastInputPath)
+  if (!prompt.files) return
 
   compressBtn.disabled = false
   abortBtn.disabled = true
+
+  settings.lastInputPath = prompt.dir
+  selectVideosBtn.value = prompt.files
+  window.logger.debug('renderer', { files: prompt.files })
+  await window.app.save(settings)
 })
 
 compressBtn.addEventListener('click', async function () {
@@ -75,14 +79,14 @@ abortBtn.addEventListener('click', async function () {
 })
 
 folderBtn.addEventListener('click', async function () {
-  let folders = await window.settingsapi.promptDirectorySelection()
-  if (!folders) return
-  let folderPath = folders[0]
+  window.logger.status('renderer', 'folderBtn clicked')
+  let prompt = await window.app.promptDirSelect(settings.out)
+  if (!prompt.dir) return
 
-  if (settings.out == folderPath) return
+  if (settings.out == prompt.dir) return
 
-  settings.out = folderPath
-  await window.settingsapi.save(settings)
+  settings.out = prompt.dir
+  await window.app.save(settings)
 })
 
 window.ffmpeg.onStart(function ({ pos, length }) {
