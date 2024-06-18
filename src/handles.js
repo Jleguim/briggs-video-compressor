@@ -5,14 +5,17 @@ const { compressor, winManager, settings } = require('./main')
 const path = require('path')
 const fs = require('fs')
 
-module.exports['app:version'] = function (e) {
+module.exports['app:info'] = function (e) {
   const package = require('../package.json')
-  return package.version
+  return {
+    name: package.readableName,
+    version: `v${package.version}`,
+    releaseNotes: `${package.repository.url.replace('.git', '')}/releases/tag/v${package.version}`,
+  }
 }
 
-module.exports['app:name'] = function (e) {
-  const package = require('../package.json')
-  return package.readableName
+module.exports['app:openInBrowser'] = function (e, url) {
+  exec('explorer.exe ' + url)
 }
 
 module.exports['logging:status'] = function (e, module, logText) {

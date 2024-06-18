@@ -24,8 +24,8 @@ async function promptSelect(type, defaultPath) {
 }
 
 contextBridge.exposeInMainWorld('app', {
-  getVersion: () => ipcRenderer.invoke('app:version'),
-  getName: () => ipcRenderer.invoke('app:name'),
+  getInfo: () => ipcRenderer.invoke('app:info'),
+  openInBrowser: (url) => ipcRenderer.invoke('app:openInBrowser', url),
   promptFileSelect: (defaultPath) => promptSelect('videos', defaultPath),
   promptDirSelect: (defaultPath) => promptSelect('dir', defaultPath),
   get: () => ipcRenderer.invoke('settings:get'),

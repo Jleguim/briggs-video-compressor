@@ -13,7 +13,10 @@ abortBtn.disabled = true
 let settings
 
 window.addEventListener('DOMContentLoaded', async function () {
-  appVersion.innerText = `v${await window.app.getVersion()}`
+  let appInfo = await window.app.getInfo()
+  appVersion.innerText = appInfo.version
+  appVersion.onclick = async () => await window.app.openInBrowser(appInfo.releaseNotes)
+
   // Load encoders
   let encoders = await window.ffmpeg.getEncoders()
   settings = await window.app.get()
