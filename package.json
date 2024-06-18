@@ -12,6 +12,10 @@
   "main": "src/main.js",
   "license": "MIT",
   "author": "Jleguim",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Jleguim/briggs-video-compressor.git"
+  },
   "scripts": {
     "start": "electron-forge start",
     "package": "electron-forge package",
