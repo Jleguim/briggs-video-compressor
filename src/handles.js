@@ -49,16 +49,8 @@ module.exports['settings:save'] = function (e, newSettings) {
 
 module.exports['ffmpeg:start'] = function (e, files, encoder, size, output) {
   module.exports['logging:debug'](null, 'ffmpeg', { files, encoder, size, output })
-  let queue = compressor.newQueue(files, encoder, size, output)
-
-  queue.onStart = (queueData) => winManager.mainWindow.webContents.send('ffmpeg:event:start', queueData)
-  queue.onWalk = (queueData) => winManager.mainWindow.webContents.send('ffmpeg:event:walk', queueData)
-  queue.onFinish = (queueData) => {
-    winManager.mainWindow.webContents.send('ffmpeg:event:finish', queueData)
-    exec('explorer.exe ' + output)
-  }
-
-  queue.start()
+  compressor.newQueue({ files, encoder, size, output })
+  compressor.queue.start()
 }
 
 module.exports['ffmpeg:abort'] = function () {
@@ -67,7 +59,7 @@ module.exports['ffmpeg:abort'] = function () {
 }
 
 module.exports['ffmpeg:getEncoders'] = function (e) {
-  return compressor.ENCODERS
+  return compressor.encoders
 }
 
 for (const eventName in module.exports) {

@@ -1,186 +1,202 @@
-const { execSync, spawn } = require('child_process')
+const { execSync, exec, spawn } = require('child_process')
 const path = require('node:path')
 const fs = require('fs')
 const unzip = require('extract-zip')
 
-class CompressingQueue {
-  constructor(FFMPEG_PATH, FFPROBE_PATH, options) {
-    // this.ffmpeg = ffmpeg
-    this.FFMPEG_PATH = FFMPEG_PATH
-    this.FFPROBE_PATH = FFPROBE_PATH
-    // this.settings = { encoder, size }
+class CompressQueue {
+  constructor(paths, options) {
+    this.paths = paths
     this.options = options
 
-    this.queue = this.options.files
-    this.queuePosition = 0
-    this.completed = false
+    this.files = this.options.files
+    this.position = 0
     this.aborted = false
-    this.currentTask = null
+    this.task = undefined
   }
 
-  getVideoLength(source) {
-    let cmd = `"${this.FFPROBE_PATH}" -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "${source}"`
-    let lengthBuffer = execSync(cmd)
-    let videoLength = parseFloat(lengthBuffer.toString())
-    return videoLength
+  _log(obj) {
+    console.log('CompressQueue =>', obj)
   }
 
-  calculateBitrate(source) {
-    const VIDEO_LENGTH = this.getVideoLength(source)
-    const TARGET_SIZE = this.options.size
-    let bitrate = Math.max(1, Math.floor((TARGET_SIZE * 8192.0) / (1.048576 * VIDEO_LENGTH) - 128))
-    return bitrate
+  emitEvent(eventName, data) {
+    const { winManager } = require('./main')
+    winManager.mainWindow.webContents.send(eventName, data)
   }
 
-  getFileName(source) {
-    let split = source.split('\\')
-    let name = split[split.length - 1]
-    return name
+  start() {
+    this._log('Started compression queue')
+
+    this.emitEvent('ffmpeg:event:start', {
+      files: this.files,
+      position: this.position,
+    })
+
+    this.walk()
   }
 
-  pass(source, bitrate) {
-    if (this.aborted) return
+  walk() {
+    let file = this.files[this.position]
+    let bitrate = this.calculateBitrate(file)
 
-    const FFMPEG_PATH = this.FFMPEG_PATH
-    const OUTPUT_FILE = `${this.getFileName(source)}-${this.options.encoder}-compressed.mp4`
-    const OUTPUT_PATH = path.join(this.options.output, OUTPUT_FILE)
+    this._log('Walked compression queue')
+    this.emitEvent('ffmpeg:event:walk', {
+      files: this.files,
+      position: this.position,
+    })
 
-    let args = ['-i', source, '-y', '-b:v', `${bitrate}k`, '-c:v', this.options.encoder, OUTPUT_PATH]
+    this.pass(file, bitrate)
+  }
 
-    let child = spawn(FFMPEG_PATH, args)
-    this.currentTask = { child, OUTPUT_PATH, source }
-    child.stdout.on('data', (data) => console.log(data.toString()))
-    child.stderr.on('data', (data) => console.log(data.toString()))
+  calculateBitrate(file) {
+    const length = this.getVideoLength(file)
+    return Math.max(1, Math.floor((this.options.size * 8192.0) / (1.048576 * length) - 128))
+  }
+
+  getVideoLength(file) {
+    let cmd = `"${this.paths.ffprobe}" -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "${file}"`
+    let buffer = execSync(cmd)
+    let length = parseFloat(buffer.toString())
+    return length
+  }
+
+  pass(file, bitrate) {
+    const outputFile = `${this.getFileName(file)}-${this.options.encoder}-compressed.mp4`
+    const outputPath = path.join(this.options.output, outputFile)
+
+    let args = ['-i', file, '-y', '-b:v', `${bitrate}k`, '-c:v', this.options.encoder, outputPath]
+    let child = spawn(this.paths.ffmpeg, args)
+    this.task = { child, outputPath }
 
     child.on('close', () => {
-      if (this.aborted) return
-      this.queuePosition += 1
-      this.completed = this.queuePosition == this.queue.length
+      this.position += 1
+      if (this.position == this.files.length) {
+        this.emitEvent('ffmpeg:event:finish', {
+          files: this.files,
+          position: this.position,
+        })
+
+        return exec('explorer.exe ' + this.options.output)
+      }
+
       this.walk()
     })
+
+    child.stdout.on('data', (d) => console.log(d.toString()))
+    child.stderr.on('data', (d) => console.log(d.toString()))
+  }
+
+  getFileName(file) {
+    let split = file.split('\\')
+    let name = split[split.length - 1]
+    return name
   }
 
   abort() {
     if (this.aborted) return
     this.aborted = true
-    this.currentTask.child.kill('SIGINT')
+    this.task.child.kill('SIGINT')
 
-    setTimeout(() => {
-      fs.rmSync(this.currentTask.OUTPUT_PATH)
-    }, 500)
-  }
-
-  finish() {
-    console.log('Finished compression queue')
-    if (this.onFinish) return this.onFinish({ queue: this.queue, length: this.queue.length, pos: this.queuePosition })
-  }
-
-  walk() {
-    if (this.completed) return this.finish()
-
-    let nextFile = this.queue[this.queuePosition]
-    let targetBitrate = this.calculateBitrate(nextFile)
-
-    console.log('Walked compression queue')
-    if (this.onWalk) this.onWalk({ queue: this.queue, length: this.queue.length, pos: this.queuePosition })
-
-    this.pass(nextFile, targetBitrate)
-  }
-
-  start() {
-    console.log('Started compression queue')
-    if (this.onStart) this.onStart({ queue: this.queue, length: this.queue.length, pos: this.queuePosition })
-    this.walk()
+    setTimeout(() => fs.rmSync(this.task.outputPath), 500)
   }
 }
 
 class FFmpeg {
-  constructor({ bin, out }) {
-    this.BIN_PATH = bin
-    this.OUT_PATH = out
-    this.FFMPEG_PATH = path.join(this.BIN_PATH, '/ffmpeg.exe')
-    this.FFPROBE_PATH = path.join(this.BIN_PATH, '/ffprobe.exe')
+  constructor(paths) {
+    this.ffmpeg_dl = 'https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-win64-gpl.zip'
 
-    this.ENCODERS = {
+    this.paths = {
+      bin: paths.bin,
+      out: paths.out,
+      ffmpeg: path.join(paths.bin, '/ffmpeg.exe'),
+      ffprobe: path.join(paths.bin, '/ffprobe.exe'),
+      zip: path.join(paths.bin, '/ffmpeg.zip'),
+      unzipped: path.join(paths.bin, '/ffmpeg-master-latest-win64-gpl/bin'),
+    }
+
+    this.encoders = {
       libx264: 'CPU',
       h264_amf: 'AMD HW H.264',
       h264_nvenc: 'NVIDIA NVENC H.264',
     }
-
-    this.FFMPEG_DL = 'https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-win64-gpl.zip'
   }
 
-  newQueue(files, encoder, size, output) {
-    let options = { files, encoder, size, output }
-    this.OUT_PATH = output
-    this.queue = new CompressingQueue(this.FFMPEG_PATH, this.FFPROBE_PATH, options)
-    return this.queue
-  }
-
-  async installFFMPEG(ZIP_PATH) {
-    console.log('Installing FFmpeg...')
-
-    await unzip(ZIP_PATH, { dir: this.BIN_PATH })
-    console.log('FFmpeg extracted, moving files...')
-
-    const UNZIPPED_PATH = path.join(this.BIN_PATH, '/ffmpeg-master-latest-win64-gpl/bin')
-    for (const file of ['ffmpeg.exe', 'ffprobe.exe']) {
-      let src = path.join(UNZIPPED_PATH, file)
-      let dest = path.join(this.BIN_PATH, file)
-      fs.copyFileSync(src, dest)
-      console.log(`Moved ${file}`)
-    }
-
-    console.log('Finished moving files, deleting temp files...')
-
-    for (const file of ['ffmpeg.zip', '/ffmpeg-master-latest-win64-gpl']) {
-      let filepath = path.join(this.BIN_PATH, file)
-      fs.rmSync(filepath, { recursive: true })
-      console.log(`Deleted ${filepath}`)
-    }
-
-    console.log('Finished installing FFmpeg')
-  }
-
-  async downloadFFmpeg() {
-    console.log('Downloading FFmpeg...')
-    const TEMP_PATH = path.join(this.BIN_PATH, '/ffmpeg.zip')
-    if (fs.existsSync(TEMP_PATH)) {
-      return await this.installFFMPEG(TEMP_PATH)
-    }
-
-    let request = await fetch(this.FFMPEG_DL, { methdod: 'GET' })
-    let blob = await request.blob()
-    let buffer = await blob.arrayBuffer()
-    fs.writeFileSync(TEMP_PATH, new Uint8Array(buffer))
-
-    console.log('Finished downloading FFmpeg...')
-    await this.installFFMPEG(TEMP_PATH)
-  }
-
-  async checkFFmpeg() {
-    if (fs.existsSync(this.FFMPEG_PATH) && fs.existsSync(this.FFPROBE_PATH)) {
-      return console.log('FFmpeg found, starting...')
-    }
-
-    console.log('FFmpeg not found')
-    await this.downloadFFmpeg()
+  _log(obj) {
+    console.log('FFmpegWrapper =>', obj)
   }
 
   checkDirs() {
-    if (!fs.existsSync(this.BIN_PATH)) {
-      console.log('Creating bin directory...')
-      fs.mkdirSync(this.BIN_PATH)
+    if (!fs.existsSync(this.paths.bin)) {
+      this._log('Creating bin directory...')
+      fs.mkdirSync(this.paths.bin)
     }
 
-    if (!fs.existsSync(this.OUT_PATH)) {
-      console.log('Creating out directory...')
-      fs.mkdirSync(this.OUT_PATH)
+    if (!fs.existsSync(this.paths.out)) {
+      this._log('Creating out directory...')
+      fs.mkdirSync(this.paths.out)
     }
 
-    console.log('Bin directory: ' + this.BIN_PATH)
-    console.log('Out directory: ' + this.OUT_PATH)
-    console.log('Directories checked')
+    this._log('Bin directory: ' + this.paths.bin)
+    this._log('Out directory: ' + this.paths.out)
+    this._log('Directories checked')
+  }
+
+  async checkFFmpeg() {
+    let ffmpegExists = fs.existsSync(this.paths.ffmpeg)
+    let ffprobeExists = fs.existsSync(this.paths.ffprobe)
+
+    if (ffmpegExists && ffprobeExists) {
+      return this._log('FFmpeg found, starting...')
+    }
+
+    this._log('FFmpeg not found')
+    await this.downloadFFmpeg()
+  }
+
+  async downloadFFmpeg() {
+    this._log('Downloading FFmpeg...')
+
+    let tempExists = fs.existsSync(this.paths.zip)
+    if (tempExists) {
+      return await this.installFFMPEG(this.paths.zip)
+    }
+
+    let request = await fetch(this.ffmpeg_dl, { methdod: 'GET' })
+    let blob = await request.blob()
+    let buffer = await blob.arrayBuffer()
+    fs.writeFileSync(this.paths.zip, new Uint8Array(buffer))
+
+    this._log('Finished downloading FFmpeg...')
+    await this.installFFmpeg()
+  }
+
+  async installFFmpeg() {
+    this._log('Installing FFmpeg...')
+
+    await unzip(this.paths.zip, { dir: this.paths.bin })
+    this._log('FFmpeg extracted, moving files...')
+
+    for (const file of ['ffmpeg.exe', 'ffprobe.exe']) {
+      let src = path.join(this.paths.unzipped, file)
+      let dest = path.join(this.paths.bin, file)
+      fs.copyFileSync(src, dest)
+      this._log(`Moved ${file}`)
+    }
+
+    this._log('Finished moving files, deleting temp files...')
+
+    for (const file of ['ffmpeg.zip', '/ffmpeg-master-latest-win64-gpl']) {
+      let filepath = path.join(this.paths.bin, file)
+      fs.rmSync(filepath, { recursive: true })
+      this._log(`Deleted ${filepath}`)
+    }
+
+    this._log('Finished installing FFmpeg')
+  }
+
+  newQueue(options) {
+    this.paths.out = options.output
+    this.queue = new CompressQueue(this.paths, options)
+    return this.queue
   }
 }
 

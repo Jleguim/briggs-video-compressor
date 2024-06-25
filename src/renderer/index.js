@@ -95,19 +95,19 @@ folderBtn.addEventListener('click', async function () {
   await window.app.save(settings)
 })
 
-window.ffmpeg.onStart(function ({ pos, length }) {
+window.ffmpeg.onStart(function ({ files }) {
   window.logger.status('renderer', 'ffmpeg started')
-  infoBox.innerText = `0/${length}`
+  infoBox.innerText = `0/${files.length}`
 })
 
-window.ffmpeg.onWalk(function ({ pos, length }) {
+window.ffmpeg.onWalk(function ({ position, files }) {
   window.logger.status('renderer', 'ffmpeg walked')
-  infoBox.innerText = `${pos}/${length}`
+  infoBox.innerText = `${position}/${files.length}`
 })
 
-window.ffmpeg.onFinish(function ({ pos, length }) {
+window.ffmpeg.onFinish(function ({ position, files }) {
   window.logger.status('renderer', 'ffmpeg finished')
-  infoBox.innerText = `${pos}/${length} Finished`
+  infoBox.innerText = `${position}/${files.length} Finished`
 
   selectVideosBtn.value = []
   selectVideosBtn.disabled = false
