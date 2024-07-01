@@ -8,13 +8,13 @@ const Updater = require('./UpdateService.js')
 
 const winManager = new WindowService()
 const settings = new SettingService()
-const compressor = new FFmpeg(settings)
+const ffmpeg = new FFmpeg(settings)
 const updater = new Updater()
 
 app.once('ready', async function () {
   await updater.checkForUpdates()
-  compressor.checkDirs()
-  await compressor.checkFFmpeg()
+  ffmpeg.checkDirs()
+  await ffmpeg.checkFFmpeg()
 
   let view = path.join(__dirname, '/renderer/index.html')
   let mainWindow = winManager.createMainWindow()
@@ -25,4 +25,4 @@ app.once('ready', async function () {
 
 if (require('electron-squirrel-startup')) app.quit()
 
-module.exports = { compressor, winManager, settings }
+module.exports = { ffmpeg, winManager, settings }

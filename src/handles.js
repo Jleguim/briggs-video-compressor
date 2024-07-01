@@ -1,7 +1,7 @@
 const { dialog, ipcMain, app } = require('electron')
 const { exec } = require('child_process')
 
-const { compressor, winManager, settings } = require('./main')
+const { ffmpeg, winManager, settings } = require('./main')
 const path = require('path')
 const fs = require('fs')
 
@@ -49,16 +49,16 @@ module.exports['settings:save'] = function (e, newSettings) {
 
 module.exports['ffmpeg:start'] = function (e, options) {
   module.exports['logging:debug'](null, 'ffmpeg', options)
-  compressor.compress(options)
+  ffmpeg.compress(options)
 }
 
 module.exports['ffmpeg:abort'] = function () {
   module.exports['logging:status'](null, 'ffmpeg', 'Compression queue aborted')
-  compressor.queue.abort()
+  ffmpeg.queue.abort()
 }
 
 module.exports['ffmpeg:getEncoders'] = function (e) {
-  return compressor.encoders
+  return ffmpeg.encoders
 }
 
 for (const eventName in module.exports) {

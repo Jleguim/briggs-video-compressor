@@ -3,6 +3,7 @@
 src/bin
 src/output
 package-lock.json
+.vscode/
 
 # Logs
 logs
