@@ -1,6 +1,9 @@
 function updateInfoBox(data) {
-  var progressMap = data.tasks.map((f) => `${f.progress}%`)
-  infoBox.innerText = progressMap.join(',')
+  // var progressMap = data.tasks.map((f) => `${f.progress}%`)
+  // infoBox.innerText = progressMap.join(',')
+
+  var completedTasks = data.tasks.filter((t) => t.progress >= 100).length
+  infoBox.innerText = `${completedTasks}/${data.tasks.length}`
 }
 
 function handleStart(data) {
