@@ -2,7 +2,7 @@ const { contextBridge, ipcRenderer } = require('electron')
 
 contextBridge.exposeInMainWorld('ffmpeg', {
   // Methods
-  start: (files, encoder, size, output) => ipcRenderer.invoke('ffmpeg:start', files, encoder, size, output),
+  start: (options) => ipcRenderer.invoke('ffmpeg:start', options),
   abort: () => ipcRenderer.invoke('ffmpeg:abort'),
   getEncoders: () => ipcRenderer.invoke('ffmpeg:getEncoders'),
   // Event handlers

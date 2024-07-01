@@ -3,100 +3,143 @@ const path = require('node:path')
 const fs = require('fs')
 const unzip = require('extract-zip')
 
-class CompressQueue {
-  constructor(paths, options) {
+class Task {
+  constructor(f) {
+    this.progress = 0
+    this.file = f
+    this.child = undefined
+  }
+
+  get isDone() {
+    if (this.progress >= 100) return true
+  }
+
+  toJSON() {
+    return {
+      progress: this.progress,
+      file: this.file,
+    }
+  }
+}
+
+class CompressionQueue {
+  _log = (obj) => console.log('Compression =>', obj)
+  _emitEvent = (name, data) => {
+    const winManager = require('./main').winManager
+    winManager.mainWindow.webContents.send(`ffmpeg:event:${name}`, {
+      tasks: this.tasks.map((t) => t.toJSON()),
+    })
+  }
+
+  constructor(paths, options, isSimult = false) {
     this.paths = paths
     this.options = options
+    this.isSimult = isSimult
 
-    this.files = this.options.files
+    this.tasks = this.options.files.map((f) => new Task(f))
     this.position = 0
     this.aborted = false
-    this.task = undefined
   }
 
-  _log(obj) {
-    console.log('CompressQueue =>', obj)
+  get currentTask() {
+    return this.tasks[this.position]
   }
 
-  emitEvent(eventName, data) {
-    const { winManager } = require('./main')
-    winManager.mainWindow.webContents.send(eventName, data)
+  get isFinished() {
+    if (this.isSimult) {
+      var finishedTasks = this.tasks.filter((f) => f.isDone).length
+      return finishedTasks == this.tasks.length
+    }
+
+    return this.position == this.tasks.length
   }
 
-  start() {
-    this._log('Started compression queue')
-
-    this.emitEvent('ffmpeg:event:start', {
-      files: this.files,
-      position: this.position,
-    })
-
-    this.walk()
-  }
-
-  walk() {
-    let file = this.files[this.position]
-    let bitrate = this.calculateBitrate(file)
-
-    this._log('Walked compression queue')
-    this.emitEvent('ffmpeg:event:walk', {
-      files: this.files,
-      position: this.position,
-    })
-
-    this.pass(file, bitrate)
-  }
-
-  calculateBitrate(file) {
-    const length = this.getVideoLength(file)
+  calculateBitrate(filePath) {
+    const length = this.getVideoLength(filePath)
     return Math.max(1, Math.floor((this.options.size * 8192.0) / (1.048576 * length) - 128))
   }
 
-  getVideoLength(file) {
-    let cmd = `"${this.paths.ffprobe}" -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "${file}"`
-    let buffer = execSync(cmd)
-    let length = parseFloat(buffer.toString())
+  getVideoLength(filePath) {
+    const ffprobe = this.paths.ffprobe
+    const cmd = `"${ffprobe}" -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "${filePath}"`
+    const buffer = execSync(cmd)
+    const length = parseFloat(buffer.toString())
     return length
   }
 
-  pass(file, bitrate) {
-    const outputFile = `${this.getFileName(file)}-${this.options.encoder}-compressed.mp4`
-    const outputPath = path.join(this.options.output, outputFile)
-
-    let args = ['-i', file, '-y', '-b:v', `${bitrate}k`, '-c:v', this.options.encoder, outputPath]
-    let child = spawn(this.paths.ffmpeg, args)
-    this.task = { child, outputPath }
-
-    child.on('close', () => {
-      this.position += 1
-      if (this.position == this.files.length) {
-        this.emitEvent('ffmpeg:event:finish', {
-          files: this.files,
-          position: this.position,
-        })
-
-        return exec('explorer.exe ' + this.options.output)
-      }
-
-      this.walk()
-    })
-
-    child.stdout.on('data', (d) => console.log(d.toString()))
-    child.stderr.on('data', (d) => console.log(d.toString()))
-  }
-
-  getFileName(file) {
-    let split = file.split('\\')
-    let name = split[split.length - 1]
+  getFileName(filePath) {
+    const split = filePath.split('\\')
+    const name = split[split.length - 1]
     return name
   }
 
-  abort() {
-    if (this.aborted) return
-    this.aborted = true
-    this.task.child.kill('SIGINT')
+  getCompressedName(filePath) {
+    const name = this.getFileName(filePath)
+    const encoder = this.options.encoder
+    return `${name}-${encoder}-compressed.mp4`
+  }
 
-    setTimeout(() => fs.rmSync(this.task.outputPath), 500)
+  start() {
+    this._emitEvent('start')
+    if (this.isSimult) return this.tasks.forEach((t, i) => this.pass(t, i))
+    this.pass(this.currentTask)
+  }
+
+  pass(task) {
+    if (this.aborted) return
+
+    const { output, encoder } = this.options
+    const { ffmpeg } = this.paths
+
+    const bitrate = this.calculateBitrate(task.file)
+    const outputName = this.getCompressedName(task.file)
+    const outputFile = path.join(output, outputName)
+
+    const args = ['-i', task.file, '-y', '-b:v', `${bitrate}k`, '-c:v', encoder, outputFile]
+    task.child = spawn(ffmpeg, args)
+
+    task.child.on('close', () => {
+      if (this.aborted) return
+
+      this._log(`Finished ${outputName}`)
+      this.position++
+      task.progress = 100
+
+      if (this.isFinished) {
+        this._log('Finished compressing')
+
+        this._emitEvent('finish')
+        return exec('explorer.exe ' + output)
+      }
+
+      if (!this.isSimult) this.pass(this.currentTask)
+    })
+
+    task.child.stderr.on('data', (d) => {
+      if (this.aborted) return task.child.kill('SIGINT')
+      console.log(d.toString())
+
+      task.progress += Math.floor(Math.random() * 3)
+      if (task.progress >= 99) task.progress = 99
+
+      this._emitEvent('walk')
+    })
+  }
+
+  abort() {
+    this.aborted = true
+    this.tasks.forEach((task) => {
+      if (!task.child) return
+
+      const output = this.options.output
+      const outputName = this.getCompressedName(task.file)
+      const outputFile = path.join(output, outputName)
+
+      task.child.kill('SIGINT')
+      setTimeout(() => {
+        fs.rmSync(outputFile)
+      }, 500)
+    })
   }
 }
 
@@ -193,10 +236,11 @@ class FFmpeg {
     this._log('Finished installing FFmpeg')
   }
 
-  newQueue(options) {
+  compress(options) {
     this.paths.out = options.output
-    this.queue = new CompressQueue(this.paths, options)
-    return this.queue
+    var compression = new CompressionQueue(this.paths, options)
+    this.queue = compression
+    compression.start()
   }
 }
 

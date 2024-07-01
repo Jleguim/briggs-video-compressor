@@ -47,10 +47,9 @@ module.exports['settings:save'] = function (e, newSettings) {
   return settings.save()
 }
 
-module.exports['ffmpeg:start'] = function (e, files, encoder, size, output) {
-  module.exports['logging:debug'](null, 'ffmpeg', { files, encoder, size, output })
-  compressor.newQueue({ files, encoder, size, output })
-  compressor.queue.start()
+module.exports['ffmpeg:start'] = function (e, options) {
+  module.exports['logging:debug'](null, 'ffmpeg', options)
+  compressor.compress(options)
 }
 
 module.exports['ffmpeg:abort'] = function () {
