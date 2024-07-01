@@ -3,7 +3,6 @@ const { exec } = require('child_process')
 
 const { ffmpeg, winManager, settings } = require('./main')
 const path = require('path')
-const fs = require('fs')
 
 module.exports['app:info'] = function (e) {
   const package = require('../package.json')
