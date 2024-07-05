@@ -27,7 +27,7 @@ class WindowsService {
     this.main = new BrowserWindow(options)
     this.main.loadFile(path.resolve(this.renderer_dir, 'index.html'))
 
-    // if (DEV_MODE) this.main.webContents.openDevTools()
+    if (DEV_MODE) this.main.webContents.openDevTools()
 
     return this.main
   }
