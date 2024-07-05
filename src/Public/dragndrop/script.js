@@ -1,13 +1,13 @@
-let drag_container = document.querySelector('#drag-files')
+const drag_container = document.querySelector('#drag-files')
 
-drag_container.addEventListener('drop', async (e) => {
-  e.preventDefault()
-  e.stopPropagation()
+drag_container.addEventListener('drop', async (event) => {
+  event.preventDefault()
+  event.stopPropagation()
 
   let files = []
   let extensions = ['mkv', 'avi', 'mp4']
 
-  for (const file of e.dataTransfer.files) {
+  for (const file of event.dataTransfer.files) {
     let valid = false
     extensions.forEach((extension) => {
       if (file.path.endsWith(extension)) valid = true
@@ -20,12 +20,9 @@ drag_container.addEventListener('drop', async (e) => {
 
   compressBtn.disabled = false
   abortBtn.disabled = true
-
   selectVideosBtn.value = files
 
-  window.logger.debug('renderer', { files })
   leftDrop()
-  await window.app.save(settings)
 })
 
 drag_container.addEventListener('dragover', (e) => {
@@ -34,11 +31,11 @@ drag_container.addEventListener('dragover', (e) => {
 })
 
 document.addEventListener('dragenter', (e) => {
-  window.logger.status('renderer', 'File(s) are being dragged')
   drag_container.classList.add('active')
 })
 
-document.addEventListener('dragleave', (e) => {
-  window.logger.status('renderer', 'File(s) left drop area')
+drag_container.addEventListener('dragleave', leftDrop)
+
+function leftDrop() {
   drag_container.classList.remove('active')
-})
+}

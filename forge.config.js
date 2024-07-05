@@ -4,16 +4,16 @@ module.exports = {
   packagerConfig: {
     asar: true,
     // icon: './test_icon.ico',
-    executableName: pkg.readableName,
-    name: pkg.readableName,
+    executableName: 'Briggs Compressor',
+    name: 'Briggs Compressor',
   },
   rebuildConfig: {},
   makers: [
     {
       name: '@electron-forge/maker-squirrel',
       config: {
-        exe: `${pkg.readableName}.exe`,
-        setupExe: `${pkg.readableName} v${pkg.version} Setup.exe`,
+        exe: 'Briggs Compressor.exe',
+        setupExe: `Briggs Compressor v${pkg.version} Setup.exe`,
       },
     },
   ],

@@ -1,3 +1,7 @@
+window.app.ffmpeg.whenStarted(updateInfoBox)
+window.app.ffmpeg.onUpdate(updateInfoBox)
+window.app.ffmpeg.whenFinished(handleFFmpegFinish)
+
 function updateInfoBox(data) {
   // var progressMap = data.tasks.map((f) => `${f.progress}%`)
   // infoBox.innerText = progressMap.join(',')
@@ -6,18 +10,7 @@ function updateInfoBox(data) {
   infoBox.innerText = `${completedTasks}/${data.tasks.length}`
 }
 
-function handleStart(data) {
-  window.logger.status('Renderer/ffmpeg.js', 'ffmpeg started')
-  updateInfoBox(data)
-}
-
-function handleWalk(data) {
-  //   window.logger.status('Renderer/ffmpeg.js', 'ffmpeg walked')
-  updateInfoBox(data)
-}
-
-function handleFinish(data) {
-  window.logger.status('Renderer/ffmpeg.js', 'ffmpeg finished')
+function handleFFmpegFinish(data) {
   updateInfoBox(data)
 
   selectVideosBtn.value = []
@@ -27,7 +20,3 @@ function handleFinish(data) {
   compressBtn.disabled = true
   abortBtn.disabled = true
 }
-
-window.ffmpeg.onStart(handleStart)
-window.ffmpeg.onWalk(handleWalk)
-window.ffmpeg.onFinish(handleFinish)
