@@ -2,7 +2,7 @@ const { ipcMain, app, dialog } = require('electron')
 const { exec } = require('child_process')
 const path = require('path')
 
-const { windows, settings } = require('./main')
+const { windows } = require('./main')
 const package = require('../package.json')
 
 ipcMain.handle('app:info', () => {
