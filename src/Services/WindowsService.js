@@ -25,7 +25,7 @@ class WindowsService {
     }
 
     this.main = new BrowserWindow(options)
-    this.main.loadFile(path.resolve(this.renderer_dir, 'index.html'))
+    this.main.loadFile(path.resolve(this.renderer_dir, 'compressor.html'))
 
     if (DEV_MODE) this.main.webContents.openDevTools()
 

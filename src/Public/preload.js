@@ -19,6 +19,6 @@ contextBridge.exposeInMainWorld('app', {
   settings,
   ffmpeg,
   getInfo: () => ipcRenderer.invoke('app:info'),
-  openBrowser: (url) => ipcRenderer.invoke('app:openBrowser', url),
+  openReleaseNotes: () => ipcRenderer.invoke('app:openReleaseNotes'),
   fileSelect: (opts) => ipcRenderer.invoke('app:fileSelect', opts),
 })

@@ -6,16 +6,15 @@ const { windows } = require('./main')
 const package = require('../package.json')
 
 ipcMain.handle('app:info', () => {
-  var releaseNotes = `${package.repository.url.replace('.git', '')}/releases/tag/v${app.getVersion()}`
   return {
     name: app.getName(),
     version: app.getVersion(),
-    releaseNotes: releaseNotes,
   }
 })
 
-ipcMain.handle('app:openBrowser', (e, url) => {
-  exec('explorer.exe ' + url)
+ipcMain.handle('app:openReleaseNotes', (e) => {
+  var releaseNotes = `${package.repository.url.replace('.git', '')}/releases/tag/v${app.getVersion()}`
+  exec('explorer.exe ' + releaseNotes)
 })
 
 ipcMain.handle('app:fileSelect', (e, opts) => {

@@ -6,17 +6,18 @@
 
     <script src="https://kit.fontawesome.com/c63ba016e0.js" crossorigin="anonymous"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="./dragndrop/style.css" />
+    <link rel="stylesheet" href="./dragbox.css" />
   </head>
   <body class="bg-gray-100">
-    <div class="drag-main" id="drag-files">
+    <div class="drag-main" id="_dragFiles">
       <div id="zone"></div>
       <p>Drop video(s)</p>
       <i class="fa-solid fa-file-import" size="6x"></i>
     </div>
+
     <div class="flex flex-col py-2.5 px-2 min-h-screen gap-1.5">
       <button
-        id="selectVideosBtn"
+        id="_selectBtn"
         class="rounded-md bg-white shadow-sm ring-1 ring-inset ring-gray-300 w-full py-2.5 text-sm enabled:hover:ring-blue-600 enabled:hover:bg-sky-100 disabled:opacity-75">
         Select Videos
       </button>
@@ -25,48 +26,44 @@
         <label class="text-sm w-max text-nowrap">File Size (MB)</label>
         <input
           type="number"
-          placeholder="25.0"
-          value="25.0"
-          id="fileSizeInpt"
+          placeholder="25"
+          value="25"
+          id="_sizeInpt"
           class="rounded-md bg-white w-full py-2.5 text-sm shadow-sm ring-1 ring-inset ring-gray-300 focus:outline-none focus:ring-blue-600 hover:ring-blue-600 grow text-center [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none disabled:opacity-75" />
       </div>
 
       <div class="flex justify-center items-center gap-2">
         <label class="text-sm w-max text-nowrap">Encoder</label>
         <select
-          id="encoderSelect"
+          id="_selectEncoder"
           class="rounded-md bg-white w-full py-2.5 text-sm shadow-sm ring-1 ring-inset ring-gray-300 focus:outline-none focus:ring-blue-600 hover:ring-blue-600 grow text-center [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"></select>
       </div>
 
       <button
-        id="compressBtn"
+        id="_startBtn"
         class="rounded-md bg-white w-full py-2.5 text-sm shadow-sm ring-1 ring-inset ring-gray-300 enabled:hover:ring-blue-600 enabled:hover:bg-sky-100 disabled:opacity-75">
         Compress
       </button>
       <button
-        id="abortBtn"
+        id="_abortBtn"
         class="rounded-md bg-white w-full py-2.5 text-sm shadow-sm ring-1 ring-inset ring-gray-300 enabled:hover:ring-blue-600 enabled:hover:bg-sky-100 disabled:opacity-75">
         Abort
       </button>
 
-      <div id="infoBox" class="py-1 bg-gray-200 ring-black ring-1 my-auto text-center text-sm text-bold h-5"></div>
+      <div id="_progressDiv" class="py-1 bg-gray-200 ring-black ring-1 my-auto text-center text-sm text-bold h-5"></div>
 
       <div class="flex justify-center items-center gap-2">
         <button
-          id="appVersion"
-          class="rounded-md bg-white w-full py-2 text-xs shadow-sm ring-1 ring-inset ring-gray-300 enabled:hover:ring-blue-600 enabled:hover:bg-sky-100">
-          v0.0.0
-        </button>
+          id="_appVersion"
+          class="rounded-md bg-white w-full py-2 text-xs shadow-sm ring-1 ring-inset ring-gray-300 enabled:hover:ring-blue-600 enabled:hover:bg-sky-100"></button>
         <button
-          id="folderBtn"
+          id="_outputBtn"
           class="rounded-md bg-white px-2 py-2 text-xs shadow-sm ring-1 ring-inset ring-gray-300 enabled:hover:ring-blue-600 enabled:hover:bg-sky-100">
           <i class="fa-solid fa-folder"></i>
         </button>
       </div>
     </div>
 
-    <script src="index.js"></script>
-    <script src="dragndrop/script.js"></script>
-    <script src="ffmpeg.js"></script>
+    <script src="compressor.js"></script>
   </body>
 </html>
