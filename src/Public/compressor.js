@@ -1,8 +1,6 @@
 window.addEventListener('DOMContentLoaded', main)
 
-async function main() {
-  window.settings = await window.app.settings.get()
-
+async function registerElements() {
   let elements = {
     _selectBtn: {
       events: {
@@ -167,10 +165,30 @@ async function main() {
       element.addEventListener(eventName, eventHandler)
     }
   }
+}
+
+async function main() {
+  window.settings = await window.app.settings.get()
+  window.app.ffmpeg.checkDependency()
+  await registerElements()
 
   window.app.ffmpeg.whenStarted(updateProgress)
   window.app.ffmpeg.onUpdate(updateProgress)
   window.app.ffmpeg.whenFinished(handleFFmpegFinish)
+  window.app.ffmpeg.whenDownload(handleFFmpegDownload)
+  window.app.ffmpeg.whenInstalled(handleFFmpegInstall)
+
+  function handleFFmpegDownload() {
+    console.log('handleFFmpegDownload')
+    let _downloadNotice = document.getElementById('_downloadNotice')
+    _downloadNotice.classList.remove('hidden')
+  }
+
+  function handleFFmpegInstall() {
+    console.log('handleFFmpegInstall')
+    let _downloadNotice = document.getElementById('_downloadNotice')
+    _downloadNotice.classList.add('hidden')
+  }
 
   function updateProgress(data) {
     let _progressDiv = document.getElementById('_progressDiv')

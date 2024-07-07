@@ -25,7 +25,7 @@ class FFmpegTask {
 
 class FFmpegCompression {
   _log = (obj) => console.log('FFmpegCompression =>', obj)
-  _emitEvent = (name, data) => {
+  _emitEvent = (name) => {
     const { windows } = require('../main')
     windows.main.webContents.send(`ffmpeg:${name}`, {
       tasks: this.tasks.map((t) => t.toJSON()),
@@ -143,6 +143,10 @@ class FFmpegCompression {
 
 class FFmpegService {
   _log = (obj) => console.log('FFmpegService =>', obj)
+  _emitEvent = (name) => {
+    const { windows } = require('../main')
+    windows.main.webContents.send(`ffmpeg:${name}`)
+  }
 
   constructor(FFMPEG_DL) {
     this.ffmpeg_dl = FFMPEG_DL
@@ -160,6 +164,7 @@ class FFmpegService {
     ipcMain.handle('ffmpeg:getEncoders', () => this.encoders)
     ipcMain.handle('ffmpeg:start', (e, opts) => this.compress(opts))
     ipcMain.handle('ffmpeg:abort', () => this.compression.abort())
+    ipcMain.handle('ffmpeg:checkDependency', () => this.checkDependency())
   }
 
   async checkDependency() {
@@ -169,6 +174,7 @@ class FFmpegService {
       return this._log('FFmpeg found!')
     }
 
+    this._emitEvent('dependency:download')
     await this.downloadFFmpeg()
   }
 
@@ -197,6 +203,7 @@ class FFmpegService {
     fs.rmSync(zip_path)
     fs.rmSync(unzipped_path, { recursive: true })
 
+    this._emitEvent('dependency:installed')
     this._log('Installed FFmpeg!')
   }
 

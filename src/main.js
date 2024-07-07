@@ -16,13 +16,12 @@ const services = {
 }
 
 app.once('ready', async () => {
-  const { windows, settings, updater, ffmpeg } = services
+  const { windows, settings, updater } = services
 
   require('./handles')
   app.setName('Briggs Compressor')
 
   await updater.checkUpdates()
-  await ffmpeg.checkDependency()
 
   settings.load()
   windows.createMainWindow()
