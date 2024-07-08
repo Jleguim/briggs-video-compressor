@@ -16,7 +16,7 @@
     </div>
 
     <div class="flex flex-col h-screen px-2 py-2 gap-2">
-      <button id="_selectBtn" class="py-2 px-1 w-full rounded-md bg-slate-800">Select Videos</button>
+      <button id="_selectBtn" class="py-2 px-1 w-full rounded-md bg-slate-800 disabled:opacity-75">Select Videos</button>
 
       <div class="flex justify-center items-center gap-2">
         <p class="text-sm text-nowrap">File Size <i class="text-xs">(MB)</i></p>
@@ -24,7 +24,7 @@
         id="_sizeInpt"
         type="number"
         value="25"
-        class="py-2 px-1 w-full rounded-md bg-slate-800 text-center [&::-webkit-inner-spin-button]:appearance-none" />
+        class="py-2 px-1 w-full rounded-md bg-slate-800 text-center [&::-webkit-inner-spin-button]:appearance-none disabled:opacity-75" />
       </div>
 
       <div class="flex justify-center items-center gap-2">
@@ -32,15 +32,15 @@
         <select id="_selectEncoder" class="py-2 px-1 w-full rounded-md bg-slate-800 text-center"></select>
       </div>
 
-      <button id="_startBtn" class="py-2 px-1 w-full rounded-md bg-slate-800">Compress</button>
-      <button id="_abortBtn" class="py-2 px-1 w-full rounded-md bg-slate-800">Abort</button>
+      <button id="_startBtn" class="py-2 px-1 w-full rounded-md bg-slate-800 disabled:opacity-75">Compress</button>
+      <button id="_abortBtn" class="py-2 px-1 w-full rounded-md bg-slate-800 disabled:opacity-75">Abort</button>
 
       <div id="_progressDiv" class="grow align-middle ring-1 ring ring-slate-800 flex items-center justify-center">
       </div>
 
       <div class="flex justify-center items-center gap-2 bottom">
         <button id="_appVersion" class="py-2 px-1 w-full rounded-md bg-slate-800">1.0.0</button>
-        <button id="_outputBtn" class="py-2 px-4 rounded-md bg-slate-800">
+        <button id="_outputBtn" class="py-2 px-4 rounded-md bg-slate-800 disabled:opacity-75">
             <i class="fa-solid fa-folder"></i>
         </button>  
       </div>
