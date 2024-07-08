@@ -1,35 +1,43 @@
-const { BrowserWindow, app } = require('electron')
+const { app, BrowserWindow, ipcMain } = require('electron')
 const path = require('path')
-const fs = require('fs')
-const DEV_MODE = !app.isPackaged
 
 class WindowsService {
-  constructor(RENDERER_PATH) {
-    if (!fs.existsSync(RENDERER_PATH)) throw 'RENDERER_PATH must be an existing PATH to a directory'
-
-    this.renderer_dir = RENDERER_PATH
-    this.main = undefined
+  constructor(viewsPath) {
+    this.viewsPath = viewsPath
+    this.mainWindow = null
+    this.windowSettings = {
+      title: app.getName(),
+      width: 250,
+      height: 380,
+      autoHideMenuBar: true,
+      resizable: false,
+      show: false,
+      webPreferences: { preload: path.resolve(this.viewsPath, 'preload.js') },
+    }
   }
 
   createMainWindow() {
-    let options = {
-      title: app.getName(),
-      // icon: '',
-      width: 250,
-      height: 350,
-      autoHideMenuBar: true,
-      resizable: false,
-      webPreferences: {
-        preload: path.resolve(this.renderer_dir, 'preload.js'),
-      },
-    }
+    let mainWindowFile = path.resolve(this.viewsPath, 'compressor.html')
+    let mainWindow = this.createWindow(this.windowSettings)
 
-    this.main = new BrowserWindow(options)
-    this.main.loadFile(path.resolve(this.renderer_dir, 'compressor.html'))
+    this.mainWindow = mainWindow
+    this.mainWindow.loadFile(mainWindowFile)
 
-    if (DEV_MODE) this.main.webContents.openDevTools()
+    return this.mainWindow
+  }
 
-    return this.main
+  createWindow(options) {
+    options = Object.assign(options, { show: false })
+    var win = new BrowserWindow(options)
+
+    win.on('ready-to-show', () => win.show())
+
+    return win
+  }
+
+  createModalWindow(options) {
+    options = Object.assign(options, { parent: this.mainWindow, modal: true })
+    return this.createWindow(options)
   }
 }
 

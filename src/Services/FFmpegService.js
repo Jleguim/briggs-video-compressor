@@ -162,9 +162,26 @@ class FFmpegService {
     }
 
     ipcMain.handle('ffmpeg:getEncoders', () => this.encoders)
+    ipcMain.handle('ffmpeg:checkDependency', () => this.checkDependency())
+
     ipcMain.handle('ffmpeg:start', (e, opts) => this.compress(opts))
     ipcMain.handle('ffmpeg:abort', () => this.compression.abort())
-    ipcMain.handle('ffmpeg:checkDependency', () => this.checkDependency())
+  }
+
+  createDownloadWindow() {
+    const { windows } = require('../main')
+
+    let winOptions = {
+      transparent: false,
+      frame: false,
+      width: 300,
+      height: 300,
+      resizable: false,
+    }
+
+    let winFile = path.resolve(windows.viewsPath, 'download.html')
+    this.downloadWindow = windows.createWindow(winOptions)
+    this.downloadWindow.loadFile(winFile)
   }
 
   async checkDependency() {
@@ -174,7 +191,7 @@ class FFmpegService {
       return this._log('FFmpeg found!')
     }
 
-    this._emitEvent('dependency:download')
+    this.createDownloadWindow()
     await this.downloadFFmpeg()
   }
 
@@ -203,7 +220,7 @@ class FFmpegService {
     fs.rmSync(zip_path)
     fs.rmSync(unzipped_path, { recursive: true })
 
-    this._emitEvent('dependency:installed')
+    this.downloadWindow.hide()
     this._log('Installed FFmpeg!')
   }
 

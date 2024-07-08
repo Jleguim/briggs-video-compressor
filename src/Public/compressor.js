@@ -119,7 +119,7 @@ async function registerElements() {
     },
     _dragFiles: {
       startup: (element) => {
-        document.addEventListener('dragenter', () => element.classList.add('active'))
+        document.addEventListener('dragenter', () => element.classList.remove('hidden'))
       },
       events: {
         drop: async (e) => {
@@ -136,19 +136,19 @@ async function registerElements() {
             return validExtensions.includes(extension)
           })
 
-          if (validFiles.length == 0) return e.target.parentElement.classList.remove('active')
+          if (validFiles.length == 0) return e.target.parentElement.classList.add('hidden')
 
           _startBtn.disabled = false
           _selectBtn.value = validFiles.map((f) => (f = f.path))
 
-          e.target.parentElement.classList.remove('active')
+          e.target.parentElement.classList.add('hidden')
         },
         dragover: (e) => {
           e.preventDefault()
           e.stopPropagation()
         },
         dragleave: (e) => {
-          e.target.parentElement.classList.remove('active')
+          e.target.parentElement.classList.add('hidden')
         },
       },
     },
@@ -169,26 +169,11 @@ async function registerElements() {
 
 async function main() {
   window.settings = await window.app.settings.get()
-  window.app.ffmpeg.checkDependency()
   await registerElements()
 
   window.app.ffmpeg.whenStarted(updateProgress)
   window.app.ffmpeg.onUpdate(updateProgress)
   window.app.ffmpeg.whenFinished(handleFFmpegFinish)
-  window.app.ffmpeg.whenDownload(handleFFmpegDownload)
-  window.app.ffmpeg.whenInstalled(handleFFmpegInstall)
-
-  function handleFFmpegDownload() {
-    console.log('handleFFmpegDownload')
-    let _downloadNotice = document.getElementById('_downloadNotice')
-    _downloadNotice.classList.remove('hidden')
-  }
-
-  function handleFFmpegInstall() {
-    console.log('handleFFmpegInstall')
-    let _downloadNotice = document.getElementById('_downloadNotice')
-    _downloadNotice.classList.add('hidden')
-  }
 
   function updateProgress(data) {
     let _progressDiv = document.getElementById('_progressDiv')
