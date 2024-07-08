@@ -32,7 +32,7 @@ async function registerElements() {
 
           if (!prompt) return
 
-          window.app.settings.out_path = prompt.selection[0]
+          window.settings.out_path = prompt.selection[0]
           await window.app.settings.set(window.settings)
         },
       },
