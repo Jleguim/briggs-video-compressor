@@ -27,7 +27,7 @@ class FFmpegCompression {
   _log = (obj) => console.log('FFmpegCompression =>', obj)
   _emitEvent = (name) => {
     const { windows } = require('../main')
-    windows.main.webContents.send(`ffmpeg:${name}`, {
+    windows.mainWindow.webContents.send(`ffmpeg:${name}`, {
       tasks: this.tasks.map((t) => t.toJSON()),
     })
   }
@@ -145,7 +145,7 @@ class FFmpegService {
   _log = (obj) => console.log('FFmpegService =>', obj)
   _emitEvent = (name) => {
     const { windows } = require('../main')
-    windows.main.webContents.send(`ffmpeg:${name}`)
+    windows.mainWindow.webContents.send(`ffmpeg:${name}`)
   }
 
   constructor(FFMPEG_DL) {
