@@ -179,10 +179,10 @@ async function main() {
     let _progressBar = document.getElementById('_progressBar')
 
     var completedTasks = data.tasks.filter((t) => t.progress >= 100).length
-    var progress = parseInt((completedTasks / data.tasks.length) * 100)
+    var currentTask = data.tasks[data.position]
 
-    _progressBar.firstElementChild.style.width = `${progress}%`
-    _progressBar.lastElementChild.innerText = `${progress}%`
+    _progressBar.firstElementChild.style.width = `${currentTask.progress}%`
+    _progressBar.lastElementChild.innerText = `${currentTask.progress}% ${completedTasks}/${data.tasks.length}`
   }
 
   function handleFFmpegStart(data) {

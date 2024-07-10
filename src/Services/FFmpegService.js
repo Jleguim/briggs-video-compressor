@@ -29,6 +29,7 @@ class FFmpegCompression {
     const { windows } = require('../main')
     windows.mainWindow.webContents.send(`ffmpeg:${name}`, {
       tasks: this.tasks.map((t) => t.toJSON()),
+      position: this.position,
     })
   }
 
@@ -56,7 +57,7 @@ class FFmpegCompression {
       return finishedTasks == this.tasks.length
     }
 
-    return this.position == this.tasks.length
+    return this.position + 1 == this.tasks.length
   }
 
   calculateBitrate(filePath) {
@@ -99,16 +100,16 @@ class FFmpegCompression {
     task.child.on('close', () => {
       if (this.aborted) return
 
-      this._log(`Finished ${outputName}`)
-      this.position++
       task.progress = 100
+      this._log(`Finished ${outputName}`)
 
       if (this.isFinished) {
         this._log('Finished compressing')
-
         this._emitEvent('finished')
         return exec('explorer.exe ' + output)
       }
+
+      this.position++
 
       if (!this.isSimult) this.pass(this.currentTask)
     })
@@ -117,7 +118,7 @@ class FFmpegCompression {
       if (this.aborted) return task.child.kill('SIGINT')
       console.log(d.toString())
 
-      task.progress += Math.floor(Math.random() * 3)
+      task.progress += Math.floor(Math.random() * 8)
       if (task.progress >= 99) task.progress = 99
 
       this._emitEvent('update')
@@ -225,7 +226,7 @@ class FFmpegService {
   }
 
   compress(opts) {
-    this.compression = new FFmpegCompression(this.paths, opts, true)
+    this.compression = new FFmpegCompression(this.paths, opts)
   }
 }
 
