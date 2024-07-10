@@ -145,7 +145,12 @@ class FFmpegCompression {
       const outputFile = path.join(output, outputName)
 
       task.child.kill('SIGINT')
-      setTimeout(() => fs.rmSync(outputFile), 500)
+
+      setTimeout(() => {
+        if (fs.existsSync(outputFile)) {
+          fs.rmSync(outputFile)
+        }
+      }, 500)
     })
   }
 }
