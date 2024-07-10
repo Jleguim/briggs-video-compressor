@@ -5,10 +5,44 @@ const path = require('path')
 const fs = require('fs')
 
 class FFmpegTask {
-  constructor(f) {
+  constructor(file, FFMPEG_PATHS) {
+    this.paths = FFMPEG_PATHS
+    this.file = file
+
     this.progress = 0
-    this.file = f
-    this.child = undefined
+  }
+
+  calculateProgress(str) {
+    let timeMatch = str.match(/time=(\d{2}):(\d{2}):(\d{2}.\d{2})/)
+    if (timeMatch) {
+      let hours = parseFloat(timeMatch[1])
+      let minutes = parseFloat(timeMatch[2])
+      let seconds = parseFloat(timeMatch[3])
+      this.timeInSeconds = hours * 3600 + minutes * 60 + seconds
+    }
+
+    if (this.timeInSeconds && this.durationInSeconds) {
+      let progress = Math.ceil((this.timeInSeconds / this.durationInSeconds) * 100)
+      this.progress = parseInt(progress)
+    }
+  }
+
+  getDuration() {
+    let cmd = `"${this.paths.ffprobe}" -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "${this.file}"`
+    let buffer = execSync(cmd)
+    this.durationInSeconds = parseFloat(buffer.toString())
+    return this.durationInSeconds
+  }
+
+  calculateBitrate(size) {
+    let length = this.getDuration()
+    return Math.max(1, Math.floor((size * 8192.0) / (1.048576 * length) - 128))
+  }
+
+  get fileName() {
+    let split = this.file.split('\\')
+    let name = split[split.length - 1]
+    return name
   }
 
   get isDone() {
@@ -38,7 +72,7 @@ class FFmpegCompression {
     this.options = options
     this.isSimult = isSimultaneous
 
-    this.tasks = this.options.files.map((f) => new FFmpegTask(f))
+    this.tasks = this.options.files.map((f) => new FFmpegTask(f, FFMPEG_PATHS))
     this.position = 0
     this.aborted = false
 
@@ -60,48 +94,23 @@ class FFmpegCompression {
     return this.position + 1 == this.tasks.length
   }
 
-  calculateBitrate(filePath) {
-    let length = this.getVideoLength(filePath)
-    return Math.max(1, Math.floor((this.options.size * 8192.0) / (1.048576 * length) - 128))
-  }
-
-  getVideoLength(filePath) {
-    let cmd = `"${this.paths.ffprobe}" -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "${filePath}"`
-    let buffer = execSync(cmd)
-    let length = parseFloat(buffer.toString())
-    return length
-  }
-
-  getFileName(filePath) {
-    let split = filePath.split('\\')
-    let name = split[split.length - 1]
-    return name
-  }
-
-  getCompressedName(filePath) {
-    let name = this.getFileName(filePath)
-    let encoder = this.options.encoder
-    return `${name}-${encoder}-compressed.mp4`
-  }
-
   pass(task) {
     if (this.aborted) return
 
-    const { output, encoder } = this.options
-    const { ffmpeg } = this.paths
+    const { output, encoder, size } = this.options
 
-    const bitrate = this.calculateBitrate(task.file)
-    const outputName = this.getCompressedName(task.file)
-    const outputFile = path.join(output, outputName)
+    const bitrate = task.calculateBitrate(size)
+    const outputName = `${task.fileName}-${encoder}-compressed.mp4`
+    const outputPath = path.join(output, outputName)
 
-    const args = ['-i', task.file, '-y', '-b:v', `${bitrate}k`, '-c:v', encoder, outputFile]
-    task.child = spawn(ffmpeg, args)
+    const args = ['-i', task.file, '-y', '-b:v', `${bitrate}k`, '-c:v', encoder, outputPath]
+    task.child = spawn(this.paths.ffmpeg, args)
 
     task.child.on('close', () => {
       if (this.aborted) return
 
       task.progress = 100
-      this._log(`Finished ${outputName}`)
+      this._log(`Finished ${task.fileName}`)
 
       if (this.isFinished) {
         this._log('Finished compressing')
@@ -116,10 +125,11 @@ class FFmpegCompression {
 
     task.child.stderr.on('data', (d) => {
       if (this.aborted) return task.child.kill('SIGINT')
-      console.log(d.toString())
 
-      task.progress += Math.floor(Math.random() * 8)
-      if (task.progress >= 99) task.progress = 99
+      let str = d.toString()
+
+      console.log(str)
+      task.calculateProgress(str)
 
       this._emitEvent('update')
     })
