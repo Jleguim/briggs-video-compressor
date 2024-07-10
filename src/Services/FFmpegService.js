@@ -140,14 +140,12 @@ class FFmpegCompression {
     this.tasks.forEach((task) => {
       if (!task.child) return
 
-      const output = this.options.output
-      const outputName = this.getCompressedName(task.file)
+      const { output, encoder } = this.options
+      const outputName = `${task.fileName}-${encoder}-compressed.mp4`
       const outputFile = path.join(output, outputName)
 
       task.child.kill('SIGINT')
-      setTimeout(() => {
-        fs.rmSync(outputFile)
-      }, 500)
+      setTimeout(() => fs.rmSync(outputFile), 500)
     })
   }
 }
