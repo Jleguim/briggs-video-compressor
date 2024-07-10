@@ -72,7 +72,7 @@ async function registerElements() {
       events: {
         click: async (e) => {
           let _selectEncoder = document.getElementById('_selectEncoder')
-          let _progressDiv = document.getElementById('_progressDiv')
+          let _progressBar = document.getElementById('_progressBar')
           let _outputBtn = document.getElementById('_outputBtn')
           let _selectBtn = document.getElementById('_selectBtn')
           let _sizeInpt = document.getElementById('_sizeInpt')
@@ -81,7 +81,7 @@ async function registerElements() {
 
           e.target.disabled = true
           _selectEncoder.disabled = false
-          _progressDiv.innerText = ''
+          _progressBar.classList.add('hidden')
           _outputBtn.disabled = false
           _selectBtn.disabled = false
           _sizeInpt.disabled = false
@@ -178,11 +178,15 @@ async function main() {
   function updateProgress(data) {
     let _progressBar = document.getElementById('_progressBar')
 
-    var completedTasks = data.tasks.filter((t) => t.progress >= 100).length
-    var currentTask = data.tasks[data.position]
+    let completedTasks = data.tasks.filter((t) => t.progress >= 100).length
+    let currentTask = data.tasks[data.position]
 
-    _progressBar.firstElementChild.style.width = `${currentTask.progress}%`
-    _progressBar.lastElementChild.innerText = `${currentTask.progress}% ${completedTasks}/${data.tasks.length}`
+    let bar = _progressBar.firstElementChild
+    let count = _progressBar.lastElementChild
+
+    bar.style.width = `${currentTask.progress}%`
+    bar.innerText = `${currentTask.progress}%`
+    count.innerText = `${completedTasks}/${data.tasks.length}`
   }
 
   function handleFFmpegStart(data) {
