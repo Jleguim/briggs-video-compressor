@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain } = require('electron')
+const { app, BrowserWindow } = require('electron')
 const path = require('path')
 
 class WindowsService {
@@ -8,7 +8,7 @@ class WindowsService {
     this.windowSettings = {
       title: app.getName(),
       width: 250,
-      height: 380,
+      height: 350,
       autoHideMenuBar: true,
       resizable: false,
       show: false,

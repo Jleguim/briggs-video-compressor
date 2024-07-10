@@ -171,20 +171,26 @@ async function main() {
   window.settings = await window.app.settings.get()
   await registerElements()
 
-  window.app.ffmpeg.whenStarted(updateProgress)
+  window.app.ffmpeg.whenStarted(handleFFmpegStart)
   window.app.ffmpeg.onUpdate(updateProgress)
   window.app.ffmpeg.whenFinished(handleFFmpegFinish)
 
   function updateProgress(data) {
-    let _progressDiv = document.getElementById('_progressDiv')
-
-    // var progressMap = data.tasks.map((f) => `${f.progress}%`)
-    // var progress = progressMap.join(',')
+    let _progressBar = document.getElementById('_progressBar')
 
     var completedTasks = data.tasks.filter((t) => t.progress >= 100).length
-    var progress = `${completedTasks}/${data.tasks.length}`
+    var progress = parseInt((completedTasks / data.tasks.length) * 100)
 
-    _progressDiv.innerText = progress
+    _progressBar.firstElementChild.style.width = `${progress}%`
+    _progressBar.lastElementChild.innerText = `${progress}%`
+  }
+
+  function handleFFmpegStart(data) {
+    let _progressBar = document.getElementById('_progressBar')
+
+    updateProgress(data)
+
+    _progressBar.classList.remove('hidden')
   }
 
   function handleFFmpegFinish(data) {

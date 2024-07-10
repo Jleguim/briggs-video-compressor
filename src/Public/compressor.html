@@ -9,7 +9,9 @@
   </head>
 
   <body class="bg-slate-900 text-slate-400 select-none">
-    <div id="_dragFiles" class="hidden absolute z-10 h-full w-full flex flex-col justify-center items-center bg-black bg-opacity-30 h-full w-full backdrop-blur-[2px]">
+    <div
+      id="_dragFiles"
+      class="hidden absolute z-10 h-full w-full flex flex-col justify-center items-center bg-black bg-opacity-30 h-full w-full backdrop-blur-[2px]">
       <div id="zone" class="h-full w-full absolute"></div>
       <i class="fa-solid fa-file-import"></i>
       <p class="text-sm">Drop video(s)</p>
@@ -21,10 +23,10 @@
       <div class="flex justify-center items-center gap-2">
         <p class="text-sm text-nowrap">File Size <i class="text-xs">(MB)</i></p>
         <input
-        id="_sizeInpt"
-        type="number"
-        value="25"
-        class="py-2 px-1 w-full rounded-md bg-slate-800 text-center [&::-webkit-inner-spin-button]:appearance-none disabled:opacity-75" />
+          id="_sizeInpt"
+          type="number"
+          value="25"
+          class="py-2 px-1 w-full rounded-md bg-slate-800 text-center [&::-webkit-inner-spin-button]:appearance-none disabled:opacity-75" />
       </div>
 
       <div class="flex justify-center items-center gap-2">
@@ -35,16 +37,19 @@
       <button id="_startBtn" class="py-2 px-1 w-full rounded-md bg-slate-800 disabled:opacity-75">Compress</button>
       <button id="_abortBtn" class="py-2 px-1 w-full rounded-md bg-slate-800 disabled:opacity-75">Abort</button>
 
-      <div id="_progressDiv" class="grow align-middle ring-1 ring ring-slate-800 flex items-center justify-center">
+      <div id="_progressDiv" class="grow">
+        <div id="_progressBar" class="hidden relative h-full rounded-full ring-1 ring-slate-800">
+          <div class="h-full w-[0] rounded-full bg-slate-800"></div>
+          <div class="absolute left-0 top-0 h-full w-full truncate px-2 text-xs">0%</div>
+        </div>
       </div>
 
-      <div class="flex justify-center items-center gap-2 bottom">
+      <div class="flex items-center gap-2 w-full">
         <button id="_appVersion" class="py-2 px-1 w-full rounded-md bg-slate-800">1.0.0</button>
         <button id="_outputBtn" class="py-2 px-4 rounded-md bg-slate-800 disabled:opacity-75">
-            <i class="fa-solid fa-folder"></i>
-        </button>  
+          <i class="fa-solid fa-folder"></i>
+        </button>
       </div>
-    </div>
     </div>
 
     <script src="compressor.js"></script>
