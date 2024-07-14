@@ -1,28 +1,32 @@
 const { app } = require('electron')
 const path = require('path')
 
-const FFmpeg = require('./FFmpegService.js')
-const WindowService = require('./WindowService.js')
-const SettingService = require('./SettingService.js')
-const Updater = require('./UpdateService.js')
+const { WindowsService, SettingsService, UpdaterService, FFmpegService } = require('./Services')
 
-const winManager = new WindowService()
-const settings = new SettingService()
-const ffmpeg = new FFmpeg(settings)
-const updater = new Updater()
+const RENDERER_PATH = path.join(__dirname, './Public')
+const SETTINGS_PATH = path.join(app.getPath('userData'), '/settings.json')
+const UPDATE_SERVER = 'https://hazel-test-beta.vercel.app'
+const FFMPEG_DL = 'https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-win64-gpl.zip'
 
-app.once('ready', async function () {
-  await updater.checkForUpdates()
-  ffmpeg.checkDirs()
-  await ffmpeg.checkFFmpeg()
+const services = {
+  windows: new WindowsService(RENDERER_PATH),
+  settings: new SettingsService(SETTINGS_PATH),
+  updater: new UpdaterService(UPDATE_SERVER),
+  ffmpeg: new FFmpegService(FFMPEG_DL),
+}
 
-  let view = path.join(__dirname, '/renderer/index.html')
-  let mainWindow = winManager.createMainWindow()
-  mainWindow.loadFile(view)
+app.once('ready', async () => {
+  const { windows, settings, updater, ffmpeg } = services
 
-  require('./handles.js')
+  require('./handles')
+  app.setName('Briggs Compressor')
+  settings.load()
+
+  await updater.checkUpdates()
+  await ffmpeg.checkDependency()
+
+  windows.createMainWindow()
+  ffmpeg.downloadWindow?.destroy()
 })
 
-if (require('electron-squirrel-startup')) app.quit()
-
-module.exports = { ffmpeg, winManager, settings }
+module.exports = services

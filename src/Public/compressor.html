@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <script src="https://kit.fontawesome.com/c63ba016e0.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <!-- 
+    bg:
+    gris aun mas claro #5b5b5b
+    gris claro #373737
+    gris #313233
+    gris oscuro #26272b
+    morado: #8057d7
+
+    text:
+    morado: #8057d7
+    gris: #5f5f61
+  -->
+
+  <body class="bg-[#26272b] text-white select-none">
+    <div
+      id="_dragFiles"
+      class="hidden absolute z-10 h-full w-full flex flex-col justify-center items-center bg-black bg-opacity-30 h-full w-full backdrop-blur-[2px]">
+      <div id="zone" class="h-full w-full absolute"></div>
+      <i class="fa-solid fa-file-import"></i>
+      <p class="text-sm">Drop video(s)</p>
+    </div>
+
+    <div class="flex flex-col h-screen px-2 py-2 gap-2">
+      <button id="_selectBtn" class="py-2 px-1 w-full rounded-md bg-[#373737] disabled:opacity-75">Select Videos</button>
+
+      <div class="flex justify-center items-center gap-2">
+        <p class="text-sm text-nowrap">File Size <i class="text-xs">(MB)</i></p>
+        <input
+          id="_sizeInpt"
+          type="number"
+          value="25"
+          class="py-2 px-1 w-full rounded-md bg-[#373737] text-center [&::-webkit-inner-spin-button]:appearance-none disabled:opacity-75" />
+      </div>
+
+      <div class="flex justify-center items-center gap-2">
+        <p class="text-sm text-nowrap">Encoder</p>
+        <select id="_selectEncoder" class="py-2 px-1 w-full rounded-md bg-[#373737] text-center"></select>
+      </div>
+
+      <button id="_startBtn" class="py-2 px-1 w-full rounded-md bg-[#373737] disabled:opacity-75">Compress</button>
+      <button id="_abortBtn" class="py-2 px-1 w-full rounded-md bg-[#373737] disabled:opacity-75">Abort</button>
+
+      <div id="_progressDiv" class="grow flex">
+        <div id="_progressBar" class="hidden grow relative h-full rounded-full bg-[#373737] text-sm z-[-2]">
+          <div class="h-full rounded-full bg-[#8057d7] text-right text-[#26272b] px-2 font-medium overflow-hidden"></div>
+          <p class="absolute right-0 top-0 px-2 z-[-1]"></p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2 w-full">
+        <button id="_appVersion" class="py-2 px-1 w-full rounded-md bg-[#373737]">1.0.0</button>
+        <button id="_outputBtn" class="py-2 px-4 rounded-md bg-[#373737] disabled:opacity-75">
+          <i class="fa-solid fa-folder"></i>
+        </button>
+      </div>
+    </div>
+
+    <script src="compressor.js"></script>
+  </body>
+</html>
