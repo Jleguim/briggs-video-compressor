@@ -75,7 +75,7 @@ class UpdaterService {
     if (!app.isPackaged) return this._log('Not packaged, ignoring updates')
 
     let latestVersion = await this.getLatestVersion()
-    let currentVersion = '1.0.0'
+    let currentVersion = app.getVersion()
 
     if (!compare(currentVersion, latestVersion, '>=')) {
       this._log(`New version available: v${latestVersion}`)
