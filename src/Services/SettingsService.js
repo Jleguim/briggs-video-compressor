@@ -43,6 +43,7 @@ class SettingsObject {
     this.encoder = 'libx264'
     this.out_path = path.resolve(app.getPath('videos'))
     this.recent_path = app.getPath('videos')
+    this.recent_size = '10'
   }
 }
 

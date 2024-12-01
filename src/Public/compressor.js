@@ -106,6 +106,17 @@ async function registerElements() {
         },
       },
     },
+    _sizeInpt: {
+      startup: async (element) => {
+        element.value = window.settings.recent_size
+      },
+      events: {
+        input: async (e) => {
+          window.settings.recent_size = e.target.value
+          await window.app.settings.set(window.settings)
+        },
+      },
+    },
     _appVersion: {
       startup: async (element) => {
         var appInfo = await window.app.getInfo()
