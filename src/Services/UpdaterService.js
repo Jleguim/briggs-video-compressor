@@ -20,7 +20,8 @@ class UpdaterService {
 
   get isPortable() {
     var exec_path = path.dirname(process.execPath)
-    var squirrel_path = path.resolve(exec_path, '..', 'update,exe')
+    var squirrel_path = path.resolve(exec_path, '..', 'update.exe')
+
     return !fs.existsSync(squirrel_path)
   }
 
@@ -81,7 +82,7 @@ class UpdaterService {
       this._log(`New version available: v${latestVersion}`)
 
       if (this.isPortable) return this.portableUpdateDialog()
-      else return this.squirrelUpdateDialog()
+      else return this.promptSquirrelUpdateNotice()
     }
 
     this._log('Already up to date!')
