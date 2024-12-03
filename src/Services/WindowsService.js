@@ -16,6 +16,20 @@ class WindowsService {
     }
   }
 
+  createDownloadWindow() {
+    let winOptions = {
+      transparent: false,
+      frame: false,
+      width: 300,
+      height: 300,
+      resizable: false,
+    }
+
+    let winFile = path.resolve(this.viewsPath, 'download.html')
+    this.downloadWindow = this.createWindow(winOptions)
+    this.downloadWindow.loadFile(winFile)
+  }
+
   createMainWindow() {
     let mainWindowFile = path.resolve(this.viewsPath, 'compressor.html')
     let mainWindow = this.createWindow(this.windowSettings)

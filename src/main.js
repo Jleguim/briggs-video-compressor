@@ -6,27 +6,33 @@ const { WindowsService, SettingsService, UpdaterService, FFmpegService } = requi
 const RENDERER_PATH = path.join(__dirname, './Public')
 const SETTINGS_PATH = path.join(app.getPath('userData'), '/settings.json')
 const UPDATE_SERVER = 'https://hazel-test-beta.vercel.app'
-const FFMPEG_DL = 'https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-win64-gpl.zip'
 
 const services = {
   windows: new WindowsService(RENDERER_PATH),
   settings: new SettingsService(SETTINGS_PATH),
   updater: new UpdaterService(UPDATE_SERVER),
-  ffmpeg: new FFmpegService(FFMPEG_DL),
+  ffmpeg: new FFmpegService(),
 }
 
+services.ffmpeg.events.on('installingDependencies', (finished) => {
+  if (!finished) {
+    services.windows.createDownloadWindow()
+    return
+  }
+
+  services.windows.createMainWindow()
+  services.windows.downloadWindow?.destroy()
+})
+
 app.once('ready', async () => {
-  const { windows, settings, updater, ffmpeg } = services
+  const { settings, updater, ffmpeg } = services
 
   require('./handles')
   app.setName('Briggs Compressor')
   settings.load()
 
   await updater.checkUpdates()
-  await ffmpeg.checkDependency()
-
-  windows.createMainWindow()
-  ffmpeg.downloadWindow?.destroy()
+  await ffmpeg.getDependencies()
 })
 
 module.exports = services

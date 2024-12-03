@@ -6,13 +6,13 @@ var settings = {
 }
 
 var ffmpeg = {
-  getEncoders: () => ipcRenderer.invoke('ffmpeg:getEncoders'),
-  start: (opts) => ipcRenderer.invoke('ffmpeg:start', opts),
-  abort: () => ipcRenderer.invoke('ffmpeg:abort'),
-  //handlers
-  whenStarted: (cb) => ipcRenderer.on('ffmpeg:started', (e, data) => cb(data)),
-  onUpdate: (cb) => ipcRenderer.on('ffmpeg:update', (e, data) => cb(data)),
-  whenFinished: (cb) => ipcRenderer.on('ffmpeg:finished', (e, data) => cb(data)),
+  getEncoders: () => ipcRenderer.invoke('FFmpeg:getEncoders'),
+  start: (opts) => ipcRenderer.invoke('FFmpeg:start', opts),
+  abort: () => ipcRenderer.invoke('FFmpeg:abort'),
+  // handlers
+  whenStarted: (cb) => ipcRenderer.on('FFmpeg:started', (e, data) => cb(data)),
+  whenFinished: (cb) => ipcRenderer.on('FFmpeg:finished', (e, data) => cb(data)),
+  onUpdate: (cb) => ipcRenderer.on('FFmpeg:update', (e, data) => cb(data)),
 }
 
 contextBridge.exposeInMainWorld('app', {
